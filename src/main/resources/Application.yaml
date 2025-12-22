@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: labb3
+  datasource:
+    url: jdbc:postgresql://localhost:5432/Labb_2_test
+    username: postgres
+    password: pass
+  jpa:
+    hibernate.ddl-auto: create
+    properties.hibernate.format_sql: true
+    hibernate.show-sql: true
