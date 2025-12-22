@@ -37,7 +37,7 @@ class ProductRepositoryTest {
         Category cat2 = new Category("CategoryTest2");
         categories = categoryRepository.saveAll(List.of(cat1,cat2));
         Product newProduct = new Product("TestProduct","TST-PROD", BigDecimal.valueOf(81230.02));
-        newProduct.addCategory(cat1);
+        newProduct.addCategory(categories.getFirst());
         DBproduct = productRepository.save(newProduct);
     }
 
@@ -70,6 +70,12 @@ class ProductRepositoryTest {
     void shouldDeleteProduct(){
         productRepository.deleteById(DBproduct.getId());
         assertFalse(productRepository.existsById(DBproduct.getId()));
+    }
+
+    @Test
+    void ShouldListAllProductsOfCategory(){
+        assertFalse(productRepository.findByCategories_Name(categories.getFirst().getName()).isEmpty());
+        assertTrue(productRepository.findByCategories_Name(categories.getLast().getName()).isEmpty());
     }
 
 
