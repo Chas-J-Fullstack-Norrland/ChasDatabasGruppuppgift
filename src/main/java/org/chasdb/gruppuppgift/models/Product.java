@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -11,28 +12,30 @@ public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    Long id;
+    private Long id;
 
     @Column(nullable = false)
-    String sku;
+    private String sku;
 
     @Column(nullable = false)
-    String name;
+    private String name;
 
     @Column
-    String description;
+    private String description;
 
-    @Column(nullable = false, columnDefinition = "DECIMAL CHECK(price>0")
-    BigDecimal price;
+    @Column(nullable = false, columnDefinition = "DECIMAL CHECK(price>0)")
+    private BigDecimal price;
 
-    @Column(nullable = false,columnDefinition = "default TRUE")
-    boolean active = true;
+    @Column(nullable = false)
+    private boolean active = true;
 
-    @Column(nullable = false, columnDefinition = "DATE CHECK createdAt<=now()")
+    @Column(nullable = false, columnDefinition = "DATE CHECK(created_at<=now())")
     LocalDate createdAt = LocalDate.now();
 
-     @ManyToMany
-     Set<Category> categories; //uncomment once category done
+
+
+    @ManyToMany(cascade = CascadeType.PERSIST)
+     Set<Category> categories = new HashSet<>(); //uncomment once category done
 
     public Product() {
     }
@@ -45,6 +48,18 @@ public class Product {
         this.name = name;
         this.sku = sku;
         this.price = price;
+    }
+
+    public Set<Category> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(Set<Category> categories) {
+        this.categories = categories;
+    }
+
+    public void addCategory(Category category){
+        this.categories.add(category);
     }
 
     public Long getId() {

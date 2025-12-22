@@ -4,6 +4,7 @@ package org.chasdb.gruppuppgift.models;
 import jakarta.persistence.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -13,11 +14,11 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false,unique = true)
     String name;
 
     @ManyToMany
-    Set<Product> products;
+    Set<Product> products = new HashSet<>();
 
     public Category(){
 
