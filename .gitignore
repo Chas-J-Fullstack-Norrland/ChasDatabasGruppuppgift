@@ -40,3 +40,6 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+.idea/dataSources/60ba5c8a-fd8f-4ec9-b153-ea6b475770d2.xml
+/.idea/dataSources
+.idea/misc.xml
