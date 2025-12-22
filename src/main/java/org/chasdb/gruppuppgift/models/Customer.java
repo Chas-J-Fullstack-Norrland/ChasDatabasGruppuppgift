@@ -32,14 +32,16 @@ public class Customer {
 
     public Customer(
             String name,
-            String email,
-            LocalDateTime createdAt) {
+            String email
+            ) {
 
 
         this.name = name;
         this.email = email;
         this.createdAt = LocalDateTime.now();
     }
+
+
 
     // Getters and Setters
     public Long getId() { return id; }
