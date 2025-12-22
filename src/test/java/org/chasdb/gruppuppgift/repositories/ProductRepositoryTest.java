@@ -30,6 +30,7 @@ class ProductRepositoryTest {
 
     List<Category> categories;
     Product DBproduct;
+    Product Product_in_Stock;
 
     @BeforeEach
     void setup(){
@@ -37,8 +38,11 @@ class ProductRepositoryTest {
         Category cat2 = new Category("CategoryTest2");
         categories = categoryRepository.saveAll(List.of(cat1,cat2));
         Product newProduct = new Product("TestProduct","TST-PROD", BigDecimal.valueOf(81230.02));
+        Product newProduct2 = new Product("TestProduct2","TST-PROD2", BigDecimal.valueOf(80.02));
         newProduct.addCategory(categories.getFirst());
         DBproduct = productRepository.save(newProduct);
+        newProduct2.setQTY(5);
+        Product_in_Stock = productRepository.save(newProduct2);
     }
 
     @Test
@@ -76,6 +80,15 @@ class ProductRepositoryTest {
     void ShouldListAllProductsOfCategory(){
         assertFalse(productRepository.findByCategories_Name(categories.getFirst().getName()).isEmpty());
         assertTrue(productRepository.findByCategories_Name(categories.getLast().getName()).isEmpty());
+    }
+
+    @Test
+    void ShouldFindAllProductsBelowQTYInventory(){
+        List<Product> productStocks = productRepository.findByInventory_QtyLessThan(3);
+        assertFalse(productStocks.contains(Product_in_Stock));
+        assertTrue(productStocks.contains(DBproduct));
+
+
     }
 
 
