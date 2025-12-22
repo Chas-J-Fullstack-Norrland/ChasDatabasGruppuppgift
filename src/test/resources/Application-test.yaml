@@ -1,12 +1,12 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/Labb_2_Test  # your dedicated test DB
+    url: jdbc:postgresql://localhost:5432/db_grupp_test  # your dedicated test DB
     username: postgres
-    password: pass
+    password: {$PG_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-    ddl-auto: create-drop
+      ddl-auto: create-drop
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect

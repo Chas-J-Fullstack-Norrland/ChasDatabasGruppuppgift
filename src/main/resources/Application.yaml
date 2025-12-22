@@ -1,10 +1,10 @@
 spring:
   application:
-    name: labb3
+    name: dbgrupp
   datasource:
-    url: jdbc:postgresql://localhost:5432/Labb_2_test
+    url: jdbc:postgresql://localhost:5432/db_grupp
     username: postgres
-    password: pass
+    password: {$PG_PASSWORD}
   jpa:
     hibernate.ddl-auto: create
     properties.hibernate.format_sql: true
