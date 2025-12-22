@@ -26,7 +26,9 @@ class CategoryRepositoryTest {
     @Test
     void shouldSaveCategoryToDB(){
         Category newCategory = new Category("TestCategory");
+        repository.save(newCategory);
 
+        assertEquals(newCategory,entityManager.find(Category.class,newCategory.getId()));
     }
 
 }

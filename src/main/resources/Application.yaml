@@ -4,7 +4,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/db_grupp
     username: postgres
-    password: {$PG_PASSWORD}
+    password: ${PG_PASSWORD}
   jpa:
     hibernate.ddl-auto: create
     properties.hibernate.format_sql: true
