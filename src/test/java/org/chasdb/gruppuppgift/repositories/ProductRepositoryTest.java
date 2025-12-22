@@ -12,6 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,18 +28,21 @@ class ProductRepositoryTest {
     @Autowired
     TestEntityManager entityManager;
 
+    List<Category> categories;
+    Product DBproduct;
+
     @BeforeEach
     void setup(){
         Category cat1 = new Category("TestCategory1");
         Category cat2 = new Category("CategoryTest2");
-        categoryRepository.saveAll(List.of(cat1,cat2));
+        categories = categoryRepository.saveAll(List.of(cat1,cat2));
         Product newProduct = new Product("TestProduct","TST-PROD", BigDecimal.valueOf(81230.02));
         newProduct.addCategory(cat1);
-        Product DBproduct = productRepository.save(newProduct);
+        DBproduct = productRepository.save(newProduct);
     }
 
     @Test
-    void saveToDB(){
+    void shouldSaveProductToDB(){
         Category cat11 = new Category("TEST");
         Product newProduct = new Product("TestProduct","TST-PROD", BigDecimal.valueOf(81230.02));
         newProduct.addCategory(cat11);
@@ -47,6 +51,29 @@ class ProductRepositoryTest {
 
         assertEquals(newProduct,entityManager.find(Product.class,DBproduct.getId()));
     }
+
+    @Test
+    void findProductByID(){
+        Optional<Product> fetchedProduct = productRepository.findById(DBproduct.getId());
+        assertTrue(fetchedProduct.isPresent());
+        assertEquals(DBproduct.getName(),fetchedProduct.get().getName());
+    }
+
+    @Test
+    void shouldUpdateProduct(){
+        DBproduct.setName("UPDATED");
+        Product categoryToUpdate = productRepository.save(DBproduct);
+        assertEquals(DBproduct.getName(),entityManager.find(Product.class,categoryToUpdate.getId()).getName());
+    }
+
+    @Test
+    void shouldDeleteProduct(){
+        productRepository.deleteById(DBproduct.getId());
+        assertFalse(productRepository.existsById(DBproduct.getId()));
+    }
+
+
+
 
 
 
