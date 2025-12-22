@@ -4,6 +4,8 @@ package org.chasdb.gruppuppgift.models;
 import jakarta.persistence.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Set;
+
 @Entity
 public class Category {
 
@@ -13,6 +15,9 @@ public class Category {
 
     @Column(nullable = false)
     String name;
+
+    @ManyToMany
+    Set<Product> products;
 
     public Category(){
 

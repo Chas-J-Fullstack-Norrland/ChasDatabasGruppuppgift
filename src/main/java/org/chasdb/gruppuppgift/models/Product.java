@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Entity
 public class Product {
@@ -30,8 +31,8 @@ public class Product {
     @Column(nullable = false, columnDefinition = "DATE CHECK createdAt<=now()")
     LocalDate createdAt = LocalDate.now();
 
-     //@ManyToMany
-     //Set<Category> categories //uncomment once category done
+     @ManyToMany
+     Set<Category> categories; //uncomment once category done
 
     public Product() {
     }
