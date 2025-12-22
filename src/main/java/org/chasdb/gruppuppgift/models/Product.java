@@ -30,6 +30,8 @@ public class Product {
     @Column(nullable = false, columnDefinition = "DATE CHECK createdAt<=now()")
     LocalDate createdAt = LocalDate.now();
 
+     //@ManyToMany
+     //Set<Category> categories //uncomment once category done
 
     public Product() {
     }
