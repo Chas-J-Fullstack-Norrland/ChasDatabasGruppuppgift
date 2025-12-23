@@ -21,8 +21,6 @@ public class Inventory {
 
     }
 
-
-
     public Inventory(Product product_stock){
         this.product = product_stock;
     }

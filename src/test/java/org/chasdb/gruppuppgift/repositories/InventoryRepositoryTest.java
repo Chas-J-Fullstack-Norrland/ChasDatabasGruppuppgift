@@ -80,6 +80,14 @@ class InventoryRepositoryTest {
 
     }
 
+    @Test
+    void ShouldAddQTYToStock(){
+
+        inventoryRepository.updateQuantityBySku(productList.getLast().getSku(),5);
+        assertEquals(productList.getLast().getQTY()+5,entityManager.find(Inventory.class,productList.getLast().getId()).getQty());
+
+    }
+
 
 
 
