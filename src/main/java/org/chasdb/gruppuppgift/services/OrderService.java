@@ -42,7 +42,7 @@ public class OrderService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
         BigDecimal priceAtOrderTime = product.getPrice();
-        OrderItem = new OrderItem(
+        OrderItem item = new OrderItem(
                 order,
                 product,
                 quantity,
