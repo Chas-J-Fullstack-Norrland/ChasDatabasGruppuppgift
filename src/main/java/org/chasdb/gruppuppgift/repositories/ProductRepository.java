@@ -18,12 +18,10 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
     List<Product> findByInventory_QtyLessThan(int limit);
 
     @Modifying(clearAutomatically = true)
-    @Transactional
     @Query("UPDATE Product p SET p.active = true WHERE p.id = :id")
     void enableProduct(@Param("id") Long id);
 
     @Modifying(clearAutomatically = true)
-    @Transactional
     @Query("UPDATE Product p SET p.active = false WHERE p.id = :id")
     void disableProduct(@Param("id") Long id);
 

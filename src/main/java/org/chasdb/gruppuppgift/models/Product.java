@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+
 @Entity
 public class Product {
 
@@ -60,6 +61,17 @@ public class Product {
         this.name = name;
         this.sku = sku;
         this.price = price;
+    }
+    public Product(
+            String name,
+            String sku,
+            String description,
+            BigDecimal price
+    ){
+        this.name = name;
+        this.sku = sku;
+        this.price = price;
+        this.description = description;
     }
 
     public Set<Category> getCategories() {
