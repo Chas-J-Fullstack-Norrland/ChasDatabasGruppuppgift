@@ -1,5 +1,6 @@
 package org.chasdb.gruppuppgift.repositories;
 
+import jakarta.transaction.Transactional;
 import org.chasdb.gruppuppgift.models.Inventory;
 import org.chasdb.gruppuppgift.models.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,11 +14,14 @@ import java.util.List;
 @Repository
 public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 
+
+
     @Modifying(clearAutomatically = true)
+    @Transactional
     @Query(value = """
     UPDATE inventory
-    SET quantity = quantity + :delta
-    WHERE product_id = (
+    SET qty = qty + :delta
+    WHERE id = (
         SELECT id FROM product WHERE sku = :sku
     )
 """, nativeQuery = true)

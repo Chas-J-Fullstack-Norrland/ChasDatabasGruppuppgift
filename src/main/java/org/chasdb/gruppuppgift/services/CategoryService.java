@@ -6,14 +6,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CategoryService {
 
     @Autowired
-    CategoryRepository repo;
+    private CategoryRepository repo;
 
     public Category newCategory(String name){
+        Optional<Category> duplicateCategory = repo.findByName(name);
+        if (duplicateCategory.isPresent()){
+            throw new IllegalStateException("Category of that name already exists");
+        }
+
         return repo.save(new Category(name));
     }
 
