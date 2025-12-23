@@ -49,3 +49,5 @@ src/test/resources/Application-test.yaml
 src/test/resources/Application-test.yaml
 .idea/misc.xml
 src/test/resources/Application-test.yaml
+src/main/resources/Application.yaml
+src/test/resources/Application-test.yaml
