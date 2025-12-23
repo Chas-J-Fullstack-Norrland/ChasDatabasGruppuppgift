@@ -21,6 +21,19 @@ public class Order {
     )
     private Set<OrderItem> items = new HashSet<>();
     public Order() { }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setCreatedAt(LocalDate createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setItems(Set<OrderItem> items) {
+        this.items = items;
+    }
+
     public Long getId() {
         return id;
     }
@@ -43,5 +56,8 @@ public class Order {
         return items.stream()
                 .map(OrderItem::getRowTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+    public void addOrderItem(Product newProduct, int quantity) {
+        items.add(new OrderItem(this, newProduct, quantity, newProduct.getPrice().multiply(BigDecimal.valueOf(quantity))));
     }
 }

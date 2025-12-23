@@ -6,15 +6,17 @@ import org.chasdb.gruppuppgift.repositories.ProductRepository;
 import org.chasdb.gruppuppgift.services.OrderService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import static org.assertj.core.api.Assertions.*;
+import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
-@Transactional
-@ActiveProfiles
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ActiveProfiles("test")
 class OrderServiceTest {
     @Autowired
     OrderService orderService;
@@ -32,16 +34,24 @@ class OrderServiceTest {
                 "SKU-2",
                 new BigDecimal("100.00")
         );
-        productRepository.save(product);
+        Product product2 = new Product(
+                "Service Product",
+                "SKU-3",
+                new BigDecimal("100.00")
+        );
+        Product savedProduct = productRepository.save(product);
+        Product savedProduct2 = productRepository.save(product2);
+        Order orderToSave = new Order();
+        orderToSave.addOrderItem(savedProduct, 5);
         //Act
-        Order order = orderService.createOrder();
+        Order order = orderService.createOrder(orderToSave);
         Order updatedOrder = orderService.addItemToOrder(
                 order.getId(),
-                product.getId(),
+                savedProduct2.getId(),
                 3
         );
         //Assert
-        assertThat(updatedOrder.getItems()).hasSize(1);
+        assertThat(updatedOrder.getItems()).hasSize(2);
         assertThat(updatedOrder.getTotalPrice())
                 .isEqualByComparingTo(new BigDecimal("300.00"));
     }
@@ -52,14 +62,11 @@ class OrderServiceTest {
                 "SKU-3",
                 new BigDecimal("10.00")
         );
-        productRepository.save(product);
-        Order order = orderService.createOrder();
+        Product savedProduct = productRepository.save(product);
+        Order orderToSave = new Order();
+        orderToSave.addOrderItem(savedProduct, 0);
         assertThatThrownBy(() ->
-                        orderService.addItemToOrder(
-                                order.getId(),
-                                product.getId(),
-                                0
-        )
+                orderService.createOrder(orderToSave)
         ).isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Quantity must be > 0");
     }

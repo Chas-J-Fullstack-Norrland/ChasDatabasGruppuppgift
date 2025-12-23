@@ -22,8 +22,8 @@ public class OrderService {
     /**
      * Skapar en tom order (items läggs till efteråt)
      */
-    public Order createOrder() {
-        return orderRepository.save(new Order());
+    public Order createOrder(Order newOrder) {
+        return orderRepository.save(newOrder);
     }
     /**
      * Lägg till produkt i order

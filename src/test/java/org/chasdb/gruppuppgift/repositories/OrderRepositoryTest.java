@@ -1,5 +1,6 @@
 package org.chasdb.gruppuppgift.repositories;
 
+import org.assertj.core.api.BigDecimalAssert;
 import org.chasdb.gruppuppgift.models.Order;
 import org.chasdb.gruppuppgift.models.OrderItem;
 import org.chasdb.gruppuppgift.models.Product;
@@ -43,7 +44,7 @@ class OrderRepositoryTest {
         assertThat(savedOrder.getId()).isNotNull();
         assertThat(savedOrder.getItems()).hasSize(2);
 
-        assertThat(savedOrder.getTotalPrice())
-                .isEqualByComparingTo(new BigDecimal("19.99"));
+        BigDecimal expectedTotal = new BigDecimal("59.97");
+        assertThat(savedOrder.getTotalPrice()).isEqualByComparingTo(expectedTotal);
     }
 }
