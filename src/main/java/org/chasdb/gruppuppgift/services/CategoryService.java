@@ -5,6 +5,8 @@ import org.chasdb.gruppuppgift.repositories.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class CategoryService {
 
@@ -15,5 +17,8 @@ public class CategoryService {
         return repo.save(new Category(name));
     }
 
+    public List<Category> listCategories(){
+        return repo.findAll();
+    }
 
 }
