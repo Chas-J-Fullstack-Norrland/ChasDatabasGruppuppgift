@@ -22,13 +22,29 @@ public class ProductService {
         return repo.findById(id);
     }
 
-    public List<Product> FindAllProducts(){
+    public List<Product> listAllProducts(){
         return repo.findAll();
+    }
+
+    public List<Product> listProductsByCategories_name(String categoryName){
+        return repo.findByCategories_Name(categoryName);
+    }
+
+    public List<Product> listProductsWithInventory_QtyLessThan(int limit){
+        return repo.findByInventory_QtyLessThan(limit);
+    }
+
+    public void enableProduct(Long ID){
+        repo.enableProduct(ID);
+    }
+    public void disableProduct(Long ID){
+        repo.disableProduct(ID);
     }
 
     public void deleteProduct(Long id){
         repo.deleteById(id);
     }
+
 
 
 

@@ -87,6 +87,16 @@ class ProductRepositoryTest {
         List<Product> productStocks = productRepository.findByInventory_QtyLessThan(3);
         assertFalse(productStocks.contains(Product_in_Stock));
         assertTrue(productStocks.contains(DBproduct));
+    }
+
+    @Test
+    void canDisableAndEnableProduct(){
+        assertTrue(DBproduct.isActive());
+        productRepository.disableProduct(DBproduct.getId());
+
+        assertFalse(entityManager.find(Product.class,DBproduct.getId()).isActive());
+        productRepository.enableProduct(DBproduct.getId());
+        assertTrue(entityManager.find(Product.class,DBproduct.getId()).isActive());
 
 
     }
