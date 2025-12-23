@@ -40,3 +40,10 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+src/test/resources/Application-test.yaml
+.idea/copilot.data.migration.ask2agent.xml
+.idea/misc.xml
+.idea/misc.xml
+src/test/resources/Application-test.yaml
+.idea/misc.xml
+src/test/resources/Application-test.yaml
