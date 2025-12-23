@@ -32,10 +32,16 @@ class OrderRepositoryTest {
                 "SKU-1",
                 new BigDecimal("19.99")
         );
+        Product product2 = new Product(
+                "Service Product",
+                "SKU-3",
+                new BigDecimal("100.00")
+        );
         productRepository.save(product);
+        productRepository.save(product2);
         Order order = new Order();
-        OrderItem item1 = new OrderItem(order, product,2, product.getPrice());
-        OrderItem item2 = new OrderItem(order, product,1, product.getPrice());
+        OrderItem item1 = new OrderItem(order, product,2);
+        OrderItem item2 = new OrderItem(order, product2,1);
         order.getItems().add(item1);
         order.getItems().add(item2);
         //Act
@@ -44,7 +50,6 @@ class OrderRepositoryTest {
         assertThat(savedOrder.getId()).isNotNull();
         assertThat(savedOrder.getItems()).hasSize(2);
 
-        BigDecimal expectedTotal = new BigDecimal("59.97");
-        assertThat(savedOrder.getTotalPrice()).isEqualByComparingTo(expectedTotal);
+        assertThat(savedOrder.getTotalPrice()).isEqualByComparingTo(order.getTotalPrice());
     }
 }

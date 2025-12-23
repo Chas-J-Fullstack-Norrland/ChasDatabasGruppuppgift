@@ -1,4 +1,5 @@
 package org.chasdb.gruppuppgift.models;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -20,6 +21,11 @@ public class Order {
             orphanRemoval = true
     )
     private Set<OrderItem> items = new HashSet<>();
+
+
+    @Column(nullable = false)
+    private BigDecimal total_Price = BigDecimal.valueOf(0);
+
     public Order() { }
 
     public void setId(Long id) {
@@ -58,6 +64,16 @@ public class Order {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
     public void addOrderItem(Product newProduct, int quantity) {
-        items.add(new OrderItem(this, newProduct, quantity, newProduct.getPrice().multiply(BigDecimal.valueOf(quantity))));
+        items.add(new OrderItem(this, newProduct, quantity));
     }
+
+    public BigDecimal getTotal_Price() {
+        return total_Price;
+    }
+
+    public void setTotal_Price(BigDecimal total_Price) {
+        this.total_Price = total_Price;
+    }
+
+
 }

@@ -4,21 +4,18 @@ import org.chasdb.gruppuppgift.models.OrderItem;
 import org.chasdb.gruppuppgift.models.Product;
 import org.chasdb.gruppuppgift.repositories.OrderRepository;
 import org.chasdb.gruppuppgift.repositories.ProductRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 
 @Service
 public class OrderService {
-    private final OrderRepository orderRepository;
-    private final ProductRepository productRepository;
-    public OrderService(
-            OrderRepository orderRepository,
-            ProductRepository productRepository
-    ) {
-        this.orderRepository = orderRepository;
-        this.productRepository = productRepository;
-    }
+    @Autowired
+    private OrderRepository orderRepository;
+    @Autowired
+    private ProductRepository productRepository;
+
     /**
      * Skapar en tom order (items läggs till efteråt)
      */
@@ -45,8 +42,7 @@ public class OrderService {
         OrderItem item = new OrderItem(
                 order,
                 product,
-                quantity,
-                priceAtOrderTime
+                quantity
         );
         order.getItems().add(item);
         return orderRepository.save(order);

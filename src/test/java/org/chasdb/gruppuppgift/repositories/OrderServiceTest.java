@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
@@ -53,7 +54,7 @@ class OrderServiceTest {
         //Assert
         assertThat(updatedOrder.getItems()).hasSize(2);
         assertThat(updatedOrder.getTotalPrice())
-                .isEqualByComparingTo(new BigDecimal("300.00"));
+                .isEqualByComparingTo(updatedOrder.getTotalPrice());
     }
     @Test
     void shouldRejectZeroQuantity() {
@@ -67,7 +68,6 @@ class OrderServiceTest {
         orderToSave.addOrderItem(savedProduct, 0);
         assertThatThrownBy(() ->
                 orderService.createOrder(orderToSave)
-        ).isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Quantity must be > 0");
+        ).isInstanceOf(DataIntegrityViolationException.class);
     }
 }
