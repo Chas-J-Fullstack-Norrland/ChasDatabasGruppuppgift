@@ -14,7 +14,14 @@ public class Order {
     private Long id;
 
     @Column(nullable = false)
+    private BigDecimal total_Price = BigDecimal.valueOf(0);
+
+    @Column(nullable = false, columnDefinition = "DATE default now()")
     private LocalDate createdAt = LocalDate.now();
+
+    @Column(nullable = false,columnDefinition = "Varchar(10) default 'NEW' CHECK(status='NEW' OR status='PAID' OR status='CANCELED')")
+    private String status = "NEW";
+
     @OneToMany(
             mappedBy = "order",
             cascade = CascadeType.ALL,
@@ -23,8 +30,6 @@ public class Order {
     private Set<OrderItem> items = new HashSet<>();
 
 
-    @Column(nullable = false)
-    private BigDecimal total_Price = BigDecimal.valueOf(0);
 
     public Order() { }
 

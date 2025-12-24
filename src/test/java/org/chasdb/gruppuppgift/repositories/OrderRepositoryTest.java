@@ -45,6 +45,7 @@ class OrderRepositoryTest {
         OrderItem item2 = new OrderItem(order, product2,1);
         order.getItems().add(item1);
         order.getItems().add(item2);
+
         //Act
         Order savedOrder = orderRepository.save(order);
         //Assert
