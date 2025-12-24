@@ -1,5 +1,6 @@
 package org.chasdb.gruppuppgift.repositories;
 
+import jakarta.transaction.Transactional;
 import org.assertj.core.api.BigDecimalAssert;
 import org.chasdb.gruppuppgift.models.Order;
 import org.chasdb.gruppuppgift.models.OrderItem;

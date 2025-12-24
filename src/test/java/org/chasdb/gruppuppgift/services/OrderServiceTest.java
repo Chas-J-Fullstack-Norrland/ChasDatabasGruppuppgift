@@ -1,19 +1,19 @@
-package org.chasdb.gruppuppgift.repositories;
+package org.chasdb.gruppuppgift.services;
+import jakarta.transaction.Transactional;
 import org.chasdb.gruppuppgift.models.Order;
 import org.chasdb.gruppuppgift.models.Product;
 import org.chasdb.gruppuppgift.repositories.OrderRepository;
 import org.chasdb.gruppuppgift.repositories.ProductRepository;
-import org.chasdb.gruppuppgift.services.OrderService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 import static org.assertj.core.api.Assertions.*;
-import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -27,6 +27,14 @@ class OrderServiceTest {
 
     @Autowired
     ProductRepository productRepository;
+
+    @AfterEach
+    void cleanup(){
+        orderRepository.deleteAll();
+        productRepository.deleteAll();
+    }
+
+
     @Test
     void shouldCreateOrderAndAddItem() {
         //Arrange
@@ -60,7 +68,7 @@ class OrderServiceTest {
     void shouldRejectZeroQuantity() {
         Product product = new Product(
                 "Bad Quantity Product",
-                "SKU-3",
+                "SKU-4",
                 new BigDecimal("10.00")
         );
         Product savedProduct = productRepository.save(product);
@@ -69,5 +77,7 @@ class OrderServiceTest {
         assertThatThrownBy(() ->
                 orderService.createOrder(orderToSave)
         ).isInstanceOf(DataIntegrityViolationException.class);
+
+
     }
 }

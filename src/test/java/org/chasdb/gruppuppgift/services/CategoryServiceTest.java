@@ -1,5 +1,6 @@
 package org.chasdb.gruppuppgift.services;
 
+import jakarta.transaction.Transactional;
 import org.chasdb.gruppuppgift.repositories.CategoryRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
+@Transactional
 class CategoryServiceTest {
 
     @Autowired

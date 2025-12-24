@@ -1,12 +1,14 @@
-package org.chasdb.gruppuppgift.repositories;
+package org.chasdb.gruppuppgift.services;
 
 
 import org.chasdb.gruppuppgift.models.Customer;
 
-import org.chasdb.gruppuppgift.services.CustomerService;
+import org.chasdb.gruppuppgift.repositories.CustomerRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -15,6 +17,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ActiveProfiles("test")
 @Transactional
 public class CustomerServiceTest {
 

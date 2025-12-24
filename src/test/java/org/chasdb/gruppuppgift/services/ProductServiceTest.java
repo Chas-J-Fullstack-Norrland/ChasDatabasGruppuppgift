@@ -1,7 +1,9 @@
 package org.chasdb.gruppuppgift.services;
 
+import jakarta.transaction.Transactional;
 import org.chasdb.gruppuppgift.models.Product;
 import org.chasdb.gruppuppgift.repositories.ProductRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,7 +35,10 @@ class ProductServiceTest {
     Product testProduct3;
     Product testProduct4;
 
-
+    @AfterEach
+    void cleanup(){
+        repo.deleteAll();
+    }
 
     @BeforeEach
     void setup(){
@@ -49,6 +54,7 @@ class ProductServiceTest {
 
 
     @Test
+    @Transactional
     void ShouldNotaddProductWithDuplicateOrBlankSKU() {
 
 
@@ -63,15 +69,17 @@ class ProductServiceTest {
     }
 
     @Test
+    @Transactional
     void saveProductShouldThrowUponDuplicatesUnderDifferentID() {
 
-        testProduct1.setId(null);
+        Product testProduct = new Product("DuplicateSKU product", testProduct1.getSku(),BigDecimal.valueOf(999) );
         Exception IllegalState = assertThrows(IllegalStateException.class,()->
-                productService.saveProduct(testProduct1));
+                productService.saveProduct(testProduct));
 
     }
 
     @Test
+    @Transactional
     void listProductsWithInventory_QtyLessThan() {
 
         testProduct1.setQTY(1);
@@ -86,6 +94,7 @@ class ProductServiceTest {
     }
 
     @Test
+    @Transactional
     void addStockToProduct() {
 
         productService.addStockToProduct(testProduct1.getSku(),10);
