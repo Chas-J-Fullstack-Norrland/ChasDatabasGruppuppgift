@@ -27,11 +27,11 @@ public class OrderItem {
     @Column(nullable = false, columnDefinition = "INTEGER CHECK(quantity > 0)")
     private int quantity;
 
-    @Column(nullable = false,columnDefinition = "DECIMAL CHECK(unit_price>0)")
+    @Column(nullable = false,columnDefinition = "DECIMAL CHECK(unit_price>=0)")
     private BigDecimal unitPrice;
 
     /** Pris sparas per orderrad (historiskt korrekt) */
-    @Column(nullable = false,columnDefinition = "DECIMAL CHECK(row_Total>0)")
+    @Column(nullable = false,columnDefinition = "DECIMAL CHECK(row_Total>=0)")
     private BigDecimal rowTotal;
 
     public OrderItem() {}

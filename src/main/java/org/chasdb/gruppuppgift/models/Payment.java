@@ -10,16 +10,16 @@ public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     Long id;
-    @Column(nullable = false, columnDefinition = "CHECK(method='CARD' OR method='INVOICE')")
+    @Column(nullable = false, columnDefinition = "varchar(10) CHECK(method='CARD' OR method='INVOICE')")
     String method;
-    @Column(nullable = false, columnDefinition = "CHECK(status='PENDING' OR status='APPROVED' or status = 'DECLINED')")
+    @Column(nullable = false, columnDefinition = "varchar(10) CHECK(status='PENDING' OR status='APPROVED' or status = 'DECLINED')")
     String status;
 
-    @Column(nullable = false, columnDefinition = "DATETIME default now()")
+    @Column(nullable = false, columnDefinition = "TIMESTAMP default now()")
     LocalDateTime timestamp = LocalDateTime.now();
 
-    @ManyToOne
-    @JoinColumn(referencedColumnName = "id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "orders" ,referencedColumnName = "id")
     Order order;
 
     public Payment() {
