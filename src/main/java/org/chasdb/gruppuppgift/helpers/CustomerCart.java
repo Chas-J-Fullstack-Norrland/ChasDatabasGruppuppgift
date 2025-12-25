@@ -40,7 +40,6 @@ public class CustomerCart {
         List<Reservation> reservations = reservationService.getReservationsForCustomer(customerEmail);
         this.items.clear();
         for (Reservation res : reservations) {
-            // Vi hämtar hela Product-objektet via Inventory
             Product product = res.getInventory().getProduct();
             this.items.add(new CartItem(product, res.getQuantity()));
         }
@@ -64,11 +63,11 @@ public class CustomerCart {
             throw new IllegalStateException("No customer selected for the cart.");
         }
 
-        // ReservationService sköter databaslogiken och returnerar reservationen
+
         Reservation res = reservationService.reserveProduct(sku, this.customer.getEmail(), quantity);
         Product product = res.getInventory().getProduct();
 
-        // Uppdatera den lokala listan
+
         Optional<CartItem> existingItem = items.stream()
                 .filter(item -> item.getProduct().getSku().equals(sku))
                 .findFirst();
@@ -87,7 +86,7 @@ public class CustomerCart {
             throw new IllegalStateException("No customer selected.");
         }
 
-        // Hämta reservationen för att få dess ID (behövs för ReservationService)
+
         List <Reservation> reservations = reservationService.getReservationsForCustomer(this.customer.getEmail());
         Reservation toRemove = reservations.stream()
                 .filter(r -> r.getInventory().getProduct().getSku().equals(sku))
