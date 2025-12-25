@@ -2,6 +2,7 @@ package org.chasdb.gruppuppgift.repositories;
 
 import jakarta.transaction.Transactional;
 import org.assertj.core.api.BigDecimalAssert;
+import org.chasdb.gruppuppgift.models.Customer;
 import org.chasdb.gruppuppgift.models.Order;
 import org.chasdb.gruppuppgift.models.OrderItem;
 import org.chasdb.gruppuppgift.models.Product;
@@ -25,9 +26,13 @@ class OrderRepositoryTest {
     OrderRepository orderRepository;
     @Autowired
     ProductRepository productRepository;
+    @Autowired
+    CustomerRepository customerRepository;
     @Test
     void shouldPersistOrderWithItemsAndCalculateTotalExactly() {
         //Arrange
+        Customer customer = customerRepository.save(new Customer("TestCustomer","TestEmail"));
+
         Product product = new Product(
                 "Test product",
                 "SKU-1",
@@ -41,10 +46,12 @@ class OrderRepositoryTest {
         productRepository.save(product);
         productRepository.save(product2);
         Order order = new Order();
+        order.setCustomer(customer);
         OrderItem item1 = new OrderItem(order, product,2);
         OrderItem item2 = new OrderItem(order, product2,1);
         order.getItems().add(item1);
         order.getItems().add(item2);
+        order.setTotal_Price(order.calculatePriceOfProducts());
 
         //Act
         Order savedOrder = orderRepository.save(order);
@@ -52,6 +59,6 @@ class OrderRepositoryTest {
         assertThat(savedOrder.getId()).isNotNull();
         assertThat(savedOrder.getItems()).hasSize(2);
 
-        assertThat(savedOrder.getTotalPrice()).isEqualByComparingTo(order.getTotalPrice());
+        assertThat(savedOrder.getTotal_Price()).isEqualByComparingTo(order.getTotal_Price());
     }
 }

@@ -12,7 +12,7 @@ public class Payment {
     Long id;
     @Column(nullable = false, columnDefinition = "varchar(10) CHECK(method='CARD' OR method='INVOICE')")
     String method;
-    @Column(nullable = false, columnDefinition = "varchar(10) CHECK(status='PENDING' OR status='APPROVED' or status = 'DECLINED')")
+    @Column(nullable = false, columnDefinition = "varchar(10) CHECK(status='CANCELLED' OR status='PENDING' OR status='APPROVED' or status = 'DECLINED')")
     String status;
 
     @Column(nullable = false, columnDefinition = "TIMESTAMP default now()")

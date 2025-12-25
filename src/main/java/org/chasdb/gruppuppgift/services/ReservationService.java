@@ -78,6 +78,18 @@ public class ReservationService {
         reservationRepository.delete(r);
     }
 
+    @Transactional
+    public void releaseAllReservationsFromCustomer(Customer c) {
+        reservationRepository.findByCustomerEmail(c.getEmail()).forEach(this::releaseReservation);
+    }
+
+    @Transactional
+    public void deleteReservationByCustomerId(Long id){
+        reservationRepository.deleteAllByCustomerId(id);
+    }
+
+
+
     //Cancel a reservation and release stock
     @Transactional
     public void releaseReservationByID(Long reservationId) {
