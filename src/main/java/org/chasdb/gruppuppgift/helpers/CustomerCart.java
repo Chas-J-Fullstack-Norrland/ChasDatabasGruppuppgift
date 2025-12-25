@@ -8,6 +8,7 @@ import org.chasdb.gruppuppgift.services.ProductService;
 import org.chasdb.gruppuppgift.services.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -31,7 +32,7 @@ public class CustomerCart {
         this.reservationService = reservationService;
     }
 
-
+    @Transactional
     public void select(String customerEmail) {
         this.customer = customerService.getCustomerByEmail(customerEmail)
                 .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
@@ -39,13 +40,9 @@ public class CustomerCart {
         List<Reservation> reservations = reservationService.getReservationsForCustomer(customerEmail);
         this.items.clear();
         for (Reservation res : reservations) {
+            // Vi hämtar hela Product-objektet via Inventory
             Product product = res.getInventory().getProduct();
-            this.items.add(new CartItem(
-                    product.getSku(),
-                    product.getName(),
-                    product.getPrice(),
-                    res.getQuantity()
-            ));
+            this.items.add(new CartItem(product, res.getQuantity()));
         }
     }
 
@@ -61,34 +58,30 @@ public class CustomerCart {
         this.items = new ArrayList<>();
     }
 
+    @Transactional
     public void add(String sku, int quantity) {
         if (this.customer == null) {
             throw new IllegalStateException("No customer selected for the cart.");
         }
 
-        // Skicka reservation till databasen via ReservationService
-        reservationService.reserveProduct(sku, this.customer.getEmail(), quantity);
-
-        // Hämta produktinfo för att uppdatera den lokala listan med namn och pris
-        Product product = productService.findProductByID(null)
-
-                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+        // ReservationService sköter databaslogiken och returnerar reservationen
+        Reservation res = reservationService.reserveProduct(sku, this.customer.getEmail(), quantity);
+        Product product = res.getInventory().getProduct();
 
         // Uppdatera den lokala listan
         Optional<CartItem> existingItem = items.stream()
-                .filter(item -> item.getSku().equals(sku))
+                .filter(item -> item.getProduct().getSku().equals(sku))
                 .findFirst();
 
         if (existingItem.isPresent()) {
             existingItem.get().setQuantity(existingItem.get().getQuantity() + quantity);
         } else {
-
-            items.add(new CartItem(product.getSku(), product.getName(), product.getPrice(), quantity));
+            items.add(new CartItem(product, quantity));
         }
     }
 
 
-
+    @Transactional
     public void remove(String sku) {
         if (this.customer == null) {
             throw new IllegalStateException("No customer selected.");
@@ -105,7 +98,7 @@ public class CustomerCart {
         reservationService.releaseReservationByID(toRemove.getId());
 
 
-        items.removeIf(item -> item.getSku().equals(sku));
+        items.removeIf(item -> item.getProduct().equals(toRemove.getInventory().getProduct()));
     }
 
 
@@ -119,21 +112,15 @@ public class CustomerCart {
 
 
     public static class CartItem {
-        private String sku;
-        private String name;      // Nytt fält
-        private BigDecimal price; // Nytt fält
+        private Product product;
         private int quantity;
 
-        public CartItem(String sku, String name, BigDecimal price, int quantity) {
-            this.sku = sku;
-            this.name = name;
-            this.price = price;
+        public CartItem(Product product, int quantity) {
+            this.product = product;
             this.quantity = quantity;
         }
 
-        public String getSku() { return sku; }
-        public String getName() { return name; }      // Ny getter
-        public BigDecimal getPrice() { return price; } // Ny getter
+        public Product getProduct() { return product; }
         public int getQuantity() { return quantity; }
         public void setQuantity(int quantity) { this.quantity = quantity; }
     }
