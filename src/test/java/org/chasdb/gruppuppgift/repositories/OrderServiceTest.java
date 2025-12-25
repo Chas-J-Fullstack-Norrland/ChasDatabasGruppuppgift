@@ -30,7 +30,7 @@ class OrderServiceTest {
     @Test
     void shouldCreateOrderAndAddItem() {
         //Arrange
-        Product product = new Product(
+        Product product1 = new Product(
                 "Service Product",
                 "SKU-2",
                 new BigDecimal("100.00")
@@ -40,10 +40,12 @@ class OrderServiceTest {
                 "SKU-3",
                 new BigDecimal("100.00")
         );
-        Product savedProduct = productRepository.save(product);
+        product1.setQTY(10);
+        product2.setQTY(10);
+        Product savedProduct1 = productRepository.save(product1);
         Product savedProduct2 = productRepository.save(product2);
         Order orderToSave = new Order();
-        orderToSave.addOrderItem(savedProduct, 5);
+        orderToSave.addOrderItem(savedProduct1, 5);
         //Act
         Order order = orderService.createOrder(orderToSave);
         Order updatedOrder = orderService.addItemToOrder(
@@ -53,8 +55,10 @@ class OrderServiceTest {
         );
         //Assert
         assertThat(updatedOrder.getItems()).hasSize(2);
+        BigDecimal expectedTotal = savedProduct1.getPrice().multiply(BigDecimal.valueOf(5))
+                        .add(savedProduct2.getPrice().multiply(BigDecimal.valueOf(3)));
         assertThat(updatedOrder.getTotalPrice())
-                .isEqualByComparingTo(updatedOrder.getTotalPrice());
+                .isEqualByComparingTo(expectedTotal);
     }
     @Test
     void shouldRejectZeroQuantity() {
