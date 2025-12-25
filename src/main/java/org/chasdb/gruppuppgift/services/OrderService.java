@@ -65,7 +65,7 @@ public class OrderService {
     }
 
     @Transactional
-    public Order checkout(Customer c, List<Product> products, String paymentMethod){
+    public Order checkout(Customer c, List<Product> products, String paymentMethod){ //Chance Customer and Productlist to instead use the contents of the cart.
 
         customerService.findCustomerByID(c.getId()).orElseThrow(()->new NoSuchElementException("Customer does not exist in DB"));
 
