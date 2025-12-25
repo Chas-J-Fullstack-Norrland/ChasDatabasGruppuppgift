@@ -1,9 +1,7 @@
 package org.chasdb.gruppuppgift.repositories;
 
-import org.chasdb.gruppuppgift.models.Category;
-import org.chasdb.gruppuppgift.models.Order;
-import org.chasdb.gruppuppgift.models.Payment;
-import org.chasdb.gruppuppgift.models.Product;
+import org.chasdb.gruppuppgift.models.*;
+import org.chasdb.gruppuppgift.services.CustomerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +26,8 @@ class PaymentRepositoryTest {
     OrderRepository orderRepo;
     @Autowired
     ProductRepository productRepo;
+    @Autowired
+    CustomerRepository customerRepo;
 
     @Autowired
     TestEntityManager entityManager;
@@ -40,9 +40,12 @@ class PaymentRepositoryTest {
     Product testProduct;
     @BeforeEach
     void setup(){
+
+        Customer c = customerRepo.save(new Customer("testcustomer","testemail"));
         testProduct = productRepo.save(new Product("Test","testprod", BigDecimal.valueOf(2)));
         Order neworder = new Order();
         neworder.addOrderItem(testProduct,1);
+        neworder.setCustomer(c);
         testOrder = orderRepo.save(neworder);
         testPayment = repository.save(new Payment("CARD","APPROVED",testOrder));
     }
@@ -68,7 +71,7 @@ class PaymentRepositoryTest {
     }
 
     @Test
-    void deleteCategory(){
+    void deletePayment(){
         repository.deleteById(testPayment.getId());
         assertFalse(repository.findById(testPayment.getId()).isPresent());
     }

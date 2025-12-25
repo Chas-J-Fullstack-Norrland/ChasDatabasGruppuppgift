@@ -1,5 +1,6 @@
 package org.chasdb.gruppuppgift.services;
 import jakarta.transaction.Transactional;
+import org.chasdb.gruppuppgift.models.Customer;
 import org.chasdb.gruppuppgift.models.Order;
 import org.chasdb.gruppuppgift.models.Product;
 import org.chasdb.gruppuppgift.repositories.OrderRepository;
@@ -23,6 +24,9 @@ class OrderServiceTest {
     OrderService orderService;
 
     @Autowired
+    CustomerService customerService;
+
+    @Autowired
     OrderRepository orderRepository;
 
     @Autowired
@@ -33,6 +37,8 @@ class OrderServiceTest {
         orderRepository.deleteAll();
         productRepository.deleteAll();
     }
+
+
 
 
     @Test
@@ -48,10 +54,13 @@ class OrderServiceTest {
                 "SKU-3",
                 new BigDecimal("100.00")
         );
+        Customer c = customerService.registerCustomer("Testname","Email1@test.se");
         Product savedProduct = productRepository.save(product);
         Product savedProduct2 = productRepository.save(product2);
         Order orderToSave = new Order();
+        orderToSave.setCustomer(c);
         orderToSave.addOrderItem(savedProduct, 5);
+        orderToSave.setTotal_Price(orderToSave.calculatePriceOfProducts());
         //Act
         Order order = orderService.createOrder(orderToSave);
         Order updatedOrder = orderService.addItemToOrder(
@@ -61,8 +70,8 @@ class OrderServiceTest {
         );
         //Assert
         assertThat(updatedOrder.getItems()).hasSize(2);
-        assertThat(updatedOrder.getTotalPrice())
-                .isEqualByComparingTo(updatedOrder.getTotalPrice());
+        assertThat(updatedOrder.getTotal_Price())
+                .isEqualByComparingTo(updatedOrder.getTotal_Price());
     }
     @Test
     void shouldRejectZeroQuantity() {
@@ -71,8 +80,10 @@ class OrderServiceTest {
                 "SKU-4",
                 new BigDecimal("10.00")
         );
+        Customer c = customerService.registerCustomer("Testname","Email2@test.se");
         Product savedProduct = productRepository.save(product);
         Order orderToSave = new Order();
+        orderToSave.setCustomer(c);
         orderToSave.addOrderItem(savedProduct, 0);
         assertThatThrownBy(() ->
                 orderService.createOrder(orderToSave)

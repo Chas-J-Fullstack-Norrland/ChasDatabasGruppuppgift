@@ -30,6 +30,10 @@ public class Order {
     private Set<OrderItem> items = new HashSet<>();
 
 
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private Customer customer;
+
 
     public Order() { }
 
@@ -62,8 +66,8 @@ public class Order {
             throw new IllegalStateException("Order must contain at least one OrderItem");
         }
     }
-    /** Exakt totalsumma (BigDecimal-safe)*/
-    public BigDecimal getTotalPrice() {
+   /** Exakt totalsumma (BigDecimal-safe) om du skulle köpt produkterna idag*/
+    public BigDecimal calculatePriceOfProducts() {
         return items.stream()
                 .map(OrderItem::getRowTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -80,5 +84,19 @@ public class Order {
         this.total_Price = total_Price;
     }
 
+    public String getStatus() {
+        return status;
+    }
 
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
 }
