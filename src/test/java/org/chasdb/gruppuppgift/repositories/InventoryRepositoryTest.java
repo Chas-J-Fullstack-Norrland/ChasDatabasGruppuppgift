@@ -37,9 +37,8 @@ class InventoryRepositoryTest {
         Product productInStock = new Product("TestProduct","TST-PROD", BigDecimal.valueOf(81230.02));
         Product productNotInStock =  new Product("TestProduct2","TST-PROD2", BigDecimal.valueOf(810.02));
 
-        productInStock.setQTY(10);
-
         productList = productRepository.saveAll(List.of(productInStock,productNotInStock));
+        inventoryRepository.updateQuantityBySku("TST-PROD",10);
     }
 
     //No CREATE due to close cascading relationship with Product
@@ -84,7 +83,7 @@ class InventoryRepositoryTest {
     void ShouldAddQTYToStock(){
 
         inventoryRepository.updateQuantityBySku(productList.getLast().getSku(),5);
-        assertEquals(productList.getLast().getQTY()+5,entityManager.find(Inventory.class,productList.getLast().getId()).getQty());
+        assertEquals(5,entityManager.find(Inventory.class,productList.getLast().getId()).getQty());
 
     }
 

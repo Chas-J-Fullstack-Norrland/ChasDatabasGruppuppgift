@@ -26,6 +26,8 @@ class ProductRepositoryTest {
     @Autowired
     CategoryRepository categoryRepository;
     @Autowired
+    InventoryRepository inventoryRepository;
+    @Autowired
     TestEntityManager entityManager;
 
     List<Category> categories;
@@ -40,9 +42,11 @@ class ProductRepositoryTest {
         Product newProduct = new Product("TestProduct","TST-PROD", BigDecimal.valueOf(81230.02));
         Product newProduct2 = new Product("TestProduct2","TST-PROD2", BigDecimal.valueOf(80.02));
         newProduct.addCategory(categories.getFirst());
+
         DBproduct = productRepository.save(newProduct);
-        newProduct2.setQTY(5);
         Product_in_Stock = productRepository.save(newProduct2);
+        inventoryRepository.updateQuantityBySku(DBproduct.getSku(), 20);
+        inventoryRepository.updateQuantityBySku(Product_in_Stock.getSku(), 2);
     }
 
     @Test
@@ -84,9 +88,9 @@ class ProductRepositoryTest {
 
     @Test
     void ShouldFindAllProductsBelowQTYInventory(){
-        List<Product> productStocks = productRepository.findByInventory_QtyLessThan(3);
-        assertFalse(productStocks.contains(Product_in_Stock));
-        assertTrue(productStocks.contains(DBproduct));
+        List<Product> productStocks = productRepository.findByInventory_QtyLessThan(5);
+        assertFalse(productStocks.size()>1);
+        assertTrue(productStocks.getFirst().getName().equals(DBproduct.getName()));
     }
 
     @Test

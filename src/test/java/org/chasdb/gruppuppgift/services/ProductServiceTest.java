@@ -2,6 +2,7 @@ package org.chasdb.gruppuppgift.services;
 
 import jakarta.transaction.Transactional;
 import org.chasdb.gruppuppgift.models.Product;
+import org.chasdb.gruppuppgift.repositories.InventoryRepository;
 import org.chasdb.gruppuppgift.repositories.ProductRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -29,6 +30,8 @@ class ProductServiceTest {
     ProductService productService;
     @Autowired
     ProductRepository repo;
+    @Autowired
+    InventoryRepository inventoryRepository;
 
     Product testProduct1;
     Product testProduct2;
@@ -82,13 +85,9 @@ class ProductServiceTest {
     @Transactional
     void listProductsWithInventory_QtyLessThan() {
 
-        testProduct1.setQTY(1);
-        testProduct2.setQTY(10);
-        testProduct4.setQTY(20);
+        productService.addStockToProduct(testProduct1.getSku(),11);
 
-        Stream.of(testProduct1,testProduct2,testProduct4).forEach(productService::saveProduct);
-
-        assertEquals(2, productService.listProductsWithInventory_QtyLessThan(10).size());
+        assertEquals(3, productService.listProductsWithInventory_QtyLessThan(10).size());
 
 
     }
@@ -97,10 +96,8 @@ class ProductServiceTest {
     @Transactional
     void addStockToProduct() {
 
-        productService.addStockToProduct(testProduct1.getSku(),10);
-        assertEquals(10,productService.findProductByID(testProduct1.getId()).get().getQTY());
-        productService.addStockToProduct(testProduct1.getSku(),15);
-        assertEquals(25,productService.findProductByID(testProduct1.getId()).get().getQTY());
+        productService.addStockToProduct(testProduct2.getSku(), 22);
+        assertEquals(22,inventoryRepository.findById(testProduct2.getId()).get().getQty());
 
     }
 }

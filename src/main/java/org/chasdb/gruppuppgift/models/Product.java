@@ -41,16 +41,6 @@ public class Product {
     Set<Category> categories = new HashSet<>();
 
 
-    public int getQTY() {
-        return inventory.getQty();
-    }
-
-    public void setQTY(int quantity) {
-        this.inventory.setQty(quantity);
-    }
-
-
-
     public Product() {
     }
 
