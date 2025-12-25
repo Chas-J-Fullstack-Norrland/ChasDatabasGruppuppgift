@@ -66,13 +66,18 @@ public class PaymentService {
 
         Random r = new Random();
 
-        if(r.nextInt(10)<9) { //10% of failure
-            payment.setStatus("APPROVED");
-            return payment = repo.save(payment);
-        } else {
+        try{
+            if(r.nextInt(10)<9) { //10% of failure
+                payment.setStatus("APPROVED");
+                return payment = repo.save(payment);
+            } else {
+                throw new RuntimeException("Something went wrong, Try again");
+            }
+        }catch (Exception e){
             failedPayment(payment);
-            throw new RuntimeException("Something went wrong, Try again");
+            throw e;
         }
+
 
 
     }
@@ -97,6 +102,7 @@ public class PaymentService {
         Payment payment = new Payment("CARD","PENDING",o);
 
         Random r = new Random();
+
 
         if(r.nextInt(10)<0) { //10% of failure
             payment.setStatus("APPROVED");

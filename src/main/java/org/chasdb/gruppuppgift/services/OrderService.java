@@ -70,24 +70,38 @@ public class OrderService {
         customerService.findCustomerByID(c.getId()).orElseThrow(()->new NoSuchElementException("Customer does not exist in DB"));
 
         Order newOrder = new Order();
+        newOrder.setCustomer(c);
         products.forEach(p-> newOrder.addOrderItem(p,1));
         newOrder.setTotal_Price(newOrder.calculatePriceOfProducts());
         Order savedOrder = orderRepository.save(newOrder);
 
-        Payment p;
-        switch (paymentMethod){
-            case "CARD" -> p = paymentService.cardPay(savedOrder);
-            case "INVOICE" -> p =paymentService.savePayment("INVOICE","PENDING",savedOrder);
-            default -> throw new IllegalArgumentException("Invalid payment method");
+        Payment p = new Payment();
+        int attempts = 0;
+        while(attempts<4) {
+            try {
+                switch (paymentMethod) {
+                    case "CARD" -> p = paymentService.cardPay(savedOrder);
+                    case "INVOICE" -> p = paymentService.savePayment("INVOICE", "PENDING", savedOrder);
+                    default -> throw new IllegalArgumentException("Invalid payment method");
+                }
+                attempts = 4; //Pass and do not repeat
+            } catch (RuntimeException e) {
+                attempts++;
+
+            }
         }
 
         switch (p.getStatus()){
             case "APPROVED" -> savedOrder.setStatus("PAID");
         }
+
+
         reservationService.deleteReservationByCustomerId(c.getId());
         return newOrder;
 
     }
+
+
 
 
 }

@@ -3,7 +3,9 @@ import jakarta.transaction.Transactional;
 import org.chasdb.gruppuppgift.models.Customer;
 import org.chasdb.gruppuppgift.models.Order;
 import org.chasdb.gruppuppgift.models.Product;
+import org.chasdb.gruppuppgift.repositories.CustomerRepository;
 import org.chasdb.gruppuppgift.repositories.OrderRepository;
+import org.chasdb.gruppuppgift.repositories.PaymentRepository;
 import org.chasdb.gruppuppgift.repositories.ProductRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -14,7 +16,10 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -25,17 +30,24 @@ class OrderServiceTest {
 
     @Autowired
     CustomerService customerService;
+    @Autowired
+    CustomerRepository customerRepository;
 
     @Autowired
     OrderRepository orderRepository;
 
     @Autowired
     ProductRepository productRepository;
+    @Autowired
+    PaymentRepository paymentRepository;
 
     @AfterEach
     void cleanup(){
+        paymentRepository.deleteAll();
         orderRepository.deleteAll();
         productRepository.deleteAll();
+        customerRepository.deleteAll();
+
     }
 
 
@@ -91,4 +103,23 @@ class OrderServiceTest {
 
 
     }
+
+    @Test
+    void shouldSuccessfullyCompleteTransaction(){
+        Product product = new Product(
+                "Bad Quantity Product",
+                "SKU-4",
+                new BigDecimal("10.00")
+        );
+        Customer c = customerService.registerCustomer("Testname","Email23@test.se");
+        Product savedProduct = productRepository.save(product);
+        List<Product> savedProducts = List.of(savedProduct);
+
+        Order savedOrder = orderService.checkout(c,savedProducts,"CARD");
+
+        assertTrue(savedOrder.getStatus().equals("PAID"));
+
+
+    }
+
 }
