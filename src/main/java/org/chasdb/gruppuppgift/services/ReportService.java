@@ -12,6 +12,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDate;
@@ -65,5 +69,22 @@ public class ReportService {
                     return new DailyRevenueDTO(sqlDate.toLocalDate(), total);
                 })
                 .collect(Collectors.toList());
+    }
+
+    public void exportRevenueReportToCSV(List<DailyRevenueDTO> data) {
+        String filename = "exports/revenue_report_" + LocalDate.now() + ".csv";
+        try {
+            new File("exports").mkdirs();
+
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+                writer.write("Datum,Total Omsättning\n"); // Header
+                for (DailyRevenueDTO row : data) {
+                    writer.write(row.date() + "," + row.totalRevenue() + "\n");
+                }
+            }
+            System.out.println("Rapport exporterad till: " + filename);
+        } catch (IOException e) {
+            System.out.println("Kunde inte exportera fil: " + e.getMessage());
+        }
     }
 }

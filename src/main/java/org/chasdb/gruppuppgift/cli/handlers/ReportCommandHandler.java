@@ -102,6 +102,11 @@ public class ReportCommandHandler implements CommandHandler {
         System.out.println("\n--- OMSÄTTNING (" + from + " till " + to + ") ---");
         List<DailyRevenueDTO> revenueList = reportService.getRevenueReport(from, to);
 
+        if (input.flags().containsKey("export")) {
+            reportService.exportRevenueReportToCSV(revenueList);
+            return;
+        }
+
         if (revenueList.isEmpty()) {
             System.out.println("Ingen försäljning (betald) under perioden.");
             return;
@@ -112,6 +117,8 @@ public class ReportCommandHandler implements CommandHandler {
         for (DailyRevenueDTO dto : revenueList) {
             System.out.printf("%-15s %-15s kr%n", dto.date(), dto.totalRevenue());
         }
+
+
     }
 
     private String truncate(String str, int width) {

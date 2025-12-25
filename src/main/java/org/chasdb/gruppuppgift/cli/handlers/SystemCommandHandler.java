@@ -138,6 +138,11 @@ public class SystemCommandHandler implements CommandHandler {
         System.out.println("  report revenue                                 - Visa total försäljning per dag");
         System.out.println("  report top                                     - Visa topp 10 mest sålda produkter");
 
+        System.out.println("\nOrdrar:");
+        System.out.println("  order list [--status=PAID]                      - Visa ordrar");
+        System.out.println("  order show <id>                                 - Visa detaljer för en order");
+        System.out.println("  order cancel <id>                               - Makulera order & återställ lager (Retur)"); // <--- NYTT
+
         System.out.println("\n------------------------------");
     }
 }

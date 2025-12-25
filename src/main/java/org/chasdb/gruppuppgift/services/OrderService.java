@@ -137,4 +137,20 @@ public class OrderService {
     private boolean simulatePayment() {
         return new Random().nextDouble() < 0.90;
     }
+
+    @Transactional
+    public void cancelOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order hittades inte med ID: " + orderId));
+
+        for (OrderItem item : order.getItems()) {
+            Inventory inventory = inventoryRepository.findByProduct_Sku(item.getProduct().getSku())
+                    .orElseThrow(() -> new IllegalStateException("Lager saknas för produkt: " + item.getProduct().getSku()));
+
+            inventory.setQuantity(inventory.getQuantity() + item.getQuantity());
+            inventoryRepository.save(inventory);
+        }
+
+        orderRepository.delete(order);
+    }
 }

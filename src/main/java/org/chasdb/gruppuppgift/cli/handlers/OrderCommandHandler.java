@@ -37,6 +37,7 @@ public class OrderCommandHandler implements CommandHandler {
                 case "list" -> handleList(input);
                 case "show" -> handleShow(input);
                 case "select" -> handleSelect(input);
+                case "cancel" -> handleCancel(input);
                 default -> System.out.println("Okänd order-åtgärd.");
             }
         } catch (Exception e) {
@@ -89,6 +90,28 @@ public class OrderCommandHandler implements CommandHandler {
 
         } catch (IllegalStateException e) {
             System.out.println("CHECKOUT MISSLYCKADES: " + e.getMessage());
+        }
+    }
+
+    private void handleCancel(CommandInput input) {
+        String idStr = input.rawArgs().trim();
+        if (idStr.isEmpty()) {
+            System.out.println("Ange Order ID för att makulera. T.ex: order cancel 5");
+            return;
+        }
+
+        try {
+            Long orderId = Long.parseLong(idStr);
+            System.out.println("Makulerar order " + orderId + "...");
+
+            orderService.cancelOrder(orderId);
+
+            System.out.println("Order " + orderId + " har makulerats och lagret har återställts.");
+
+        } catch (NumberFormatException e) {
+            System.out.println("Order ID måste vara en siffra.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Kunde inte hitta ordern: " + e.getMessage());
         }
     }
 
