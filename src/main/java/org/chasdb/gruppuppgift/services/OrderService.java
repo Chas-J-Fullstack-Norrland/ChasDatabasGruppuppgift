@@ -1,4 +1,5 @@
 package org.chasdb.gruppuppgift.services;
+
 import org.chasdb.gruppuppgift.models.Inventory;
 import org.chasdb.gruppuppgift.models.Order;
 import org.chasdb.gruppuppgift.models.OrderItem;
@@ -10,6 +11,7 @@ import org.chasdb.gruppuppgift.repositories.OrderRepository;
 import org.chasdb.gruppuppgift.repositories.ProductRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;

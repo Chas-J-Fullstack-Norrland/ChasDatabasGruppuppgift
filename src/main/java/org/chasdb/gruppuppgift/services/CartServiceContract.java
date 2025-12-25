@@ -6,9 +6,7 @@ import org.chasdb.gruppuppgift.models.Reservation;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public class CartServiceContract {

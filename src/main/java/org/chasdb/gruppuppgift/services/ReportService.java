@@ -1,16 +1,16 @@
 package org.chasdb.gruppuppgift.services;
 
-import org.chasdb.gruppuppgift.models.Product;
-import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Transactional;
 import org.chasdb.gruppuppgift.models.Inventory;
+import org.chasdb.gruppuppgift.models.Product;
 import org.chasdb.gruppuppgift.models.dto.DailyRevenueDTO;
 import org.chasdb.gruppuppgift.models.dto.TopProductDTO;
 import org.chasdb.gruppuppgift.repositories.InventoryRepository;
 import org.chasdb.gruppuppgift.repositories.OrderItemRepository;
 import org.chasdb.gruppuppgift.repositories.OrderRepository;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.sql.Date;

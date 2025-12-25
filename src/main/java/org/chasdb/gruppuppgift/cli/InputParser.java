@@ -1,6 +1,7 @@
 package org.chasdb.gruppuppgift.cli;
 
 import org.springframework.stereotype.Component;
+
 import java.util.HashMap;
 import java.util.Map;
 

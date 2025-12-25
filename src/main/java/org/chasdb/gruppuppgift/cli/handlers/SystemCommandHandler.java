@@ -115,11 +115,29 @@ public class SystemCommandHandler implements CommandHandler {
 
     private void printHelp() {
         System.out.println("\n--- TILLGÄNGLIGA KOMMANDON ---");
-        System.out.println("Exempel på syntax: [domain] [action] [flags]");
-        System.out.println("exit           - Avsluta programmet");
-        System.out.println("help           - Visa denna lista");
-        System.out.println("system reset   - Töm databasen");
-        System.out.println("system import  - Importera data");
-        System.out.println("\n-- Aktiva Domäner --");
+        System.out.println("Syntax: [domain] [action] [flags]");
+
+        System.out.println("\nGenerellt:");
+        System.out.println("  exit                                           - Avsluta programmet");
+        System.out.println("  help                                           - Visa denna lista");
+
+        System.out.println("\nSystem:");
+        System.out.println("  system import --file=<sökväg>                  - Importera produkter från CSV");
+        System.out.println("  system reset                                   - Töm hela databasen (VARNING!)");
+
+        System.out.println("\nProdukter:");
+        System.out.println("  product list                                   - Visa alla produkter i lager");
+        System.out.println("  product search --q=<sökord>                    - Sök efter en produkt");
+
+        System.out.println("\nVarukorg & Order:");
+        System.out.println("  cart add --email=<mail> --sku=<sku> --qty=<n>  - Lägg produkt i varukorgen");
+        System.out.println("  cart show --email=<mail>                       - Visa innehållet i varukorgen");
+        System.out.println("  cart checkout --email=<mail>                   - Gå till kassan och skapa order");
+
+        System.out.println("\nRapporter:");
+        System.out.println("  report revenue                                 - Visa total försäljning per dag");
+        System.out.println("  report top                                     - Visa topp 10 mest sålda produkter");
+
+        System.out.println("\n------------------------------");
     }
 }

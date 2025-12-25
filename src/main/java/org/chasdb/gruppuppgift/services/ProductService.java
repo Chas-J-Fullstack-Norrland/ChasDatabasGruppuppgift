@@ -1,10 +1,10 @@
 package org.chasdb.gruppuppgift.services;
 
 import org.apache.commons.csv.CSVRecord;
-import org.chasdb.gruppuppgift.util.CSVImporter;
 import org.chasdb.gruppuppgift.models.Product;
 import org.chasdb.gruppuppgift.repositories.InventoryRepository;
 import org.chasdb.gruppuppgift.repositories.ProductRepository;
+import org.chasdb.gruppuppgift.util.CSVImporter;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;

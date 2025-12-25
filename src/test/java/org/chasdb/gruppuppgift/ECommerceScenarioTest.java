@@ -1,14 +1,14 @@
 package org.chasdb.gruppuppgift;
 
-import org.chasdb.gruppuppgift.models.Inventory;
-import org.chasdb.gruppuppgift.services.CartServiceContract;
-import org.chasdb.gruppuppgift.util.CSVImporter;
 import org.chasdb.gruppuppgift.models.Customer;
+import org.chasdb.gruppuppgift.models.Inventory;
 import org.chasdb.gruppuppgift.models.Product;
 import org.chasdb.gruppuppgift.models.enums.PaymentMethod;
 import org.chasdb.gruppuppgift.repositories.*;
+import org.chasdb.gruppuppgift.services.CartServiceContract;
 import org.chasdb.gruppuppgift.services.OrderService;
 import org.chasdb.gruppuppgift.services.ProductService;
+import org.chasdb.gruppuppgift.util.CSVImporter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 public class ECommerceScenarioTest {
