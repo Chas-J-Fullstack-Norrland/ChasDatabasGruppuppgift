@@ -14,7 +14,14 @@ public class Order {
     private Long id;
 
     @Column(nullable = false)
+    private BigDecimal total_Price = BigDecimal.valueOf(0);
+
+    @Column(nullable = false, columnDefinition = "DATE default now()")
     private LocalDate createdAt = LocalDate.now();
+
+    @Column(nullable = false,columnDefinition = "Varchar(10) default 'NEW' CHECK(status='NEW' OR status='PAID' OR status='CANCELED')")
+    private String status = "NEW";
+
     @OneToMany(
             mappedBy = "order",
             cascade = CascadeType.ALL,
@@ -23,8 +30,10 @@ public class Order {
     private Set<OrderItem> items = new HashSet<>();
 
 
-    @Column(nullable = false)
-    private BigDecimal total_Price = BigDecimal.valueOf(0);
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private Customer customer;
+
 
     public Order() { }
 
@@ -57,8 +66,8 @@ public class Order {
             throw new IllegalStateException("Order must contain at least one OrderItem");
         }
     }
-    /** Exakt totalsumma (BigDecimal-safe)*/
-    public BigDecimal getTotalPrice() {
+   /** Exakt totalsumma (BigDecimal-safe) om du skulle köpt produkterna idag*/
+    public BigDecimal calculatePriceOfProducts() {
         return items.stream()
                 .map(OrderItem::getRowTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -75,5 +84,19 @@ public class Order {
         this.total_Price = total_Price;
     }
 
+    public String getStatus() {
+        return status;
+    }
 
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
 }

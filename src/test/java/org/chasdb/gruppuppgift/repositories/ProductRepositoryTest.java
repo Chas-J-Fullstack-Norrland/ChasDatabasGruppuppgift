@@ -48,7 +48,7 @@ class ProductRepositoryTest {
     @Test
     void shouldSaveProductToDB(){
         Category cat11 = new Category("TEST");
-        Product newProduct = new Product("TestProduct","TST-PROD", BigDecimal.valueOf(81230.02));
+        Product newProduct = new Product("TestProduct3","TST-PROD3", BigDecimal.valueOf(81230.02));
         newProduct.addCategory(cat11);
         Product DBproduct = productRepository.save(newProduct);
         categoryRepository.findAll().forEach(c->System.out.println(c.getName()));
@@ -87,6 +87,16 @@ class ProductRepositoryTest {
         List<Product> productStocks = productRepository.findByInventory_QtyLessThan(3);
         assertFalse(productStocks.contains(Product_in_Stock));
         assertTrue(productStocks.contains(DBproduct));
+    }
+
+    @Test
+    void canDisableAndEnableProduct(){
+        assertTrue(DBproduct.isActive());
+        productRepository.disableProduct(DBproduct.getId());
+
+        assertFalse(entityManager.find(Product.class,DBproduct.getId()).isActive());
+        productRepository.enableProduct(DBproduct.getId());
+        assertTrue(entityManager.find(Product.class,DBproduct.getId()).isActive());
 
 
     }

@@ -27,8 +27,11 @@ public class OrderItem {
     @Column(nullable = false, columnDefinition = "INTEGER CHECK(quantity > 0)")
     private int quantity;
 
+    @Column(nullable = false,columnDefinition = "DECIMAL CHECK(unit_price>=0)")
+    private BigDecimal unitPrice;
+
     /** Pris sparas per orderrad (historiskt korrekt) */
-    @Column(nullable = false)
+    @Column(nullable = false,columnDefinition = "DECIMAL CHECK(row_Total>=0)")
     private BigDecimal rowTotal;
 
     public OrderItem() {}
@@ -53,7 +56,8 @@ public class OrderItem {
         this.order = order;
         this.product = product;
         this.quantity = quantity;
-        this.rowTotal = product.getPrice().multiply(BigDecimal.valueOf(quantity));
+        this.unitPrice = product.getPrice();
+        this.rowTotal = unitPrice.multiply(BigDecimal.valueOf(quantity));
     }
     public int getQuantity(){
         return quantity;
@@ -81,5 +85,13 @@ public class OrderItem {
 
     public BigDecimal getPrice() {
         return rowTotal;
+    }
+
+    public BigDecimal getUnitPrice() {
+        return unitPrice;
+    }
+
+    public void setUnitPrice(BigDecimal unitPrice) {
+        this.unitPrice = unitPrice;
     }
 }

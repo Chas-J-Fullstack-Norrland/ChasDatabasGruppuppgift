@@ -1,20 +1,27 @@
 package org.chasdb.gruppuppgift.services;
-import org.chasdb.gruppuppgift.models.Order;
-import org.chasdb.gruppuppgift.models.OrderItem;
-import org.chasdb.gruppuppgift.models.Product;
+import org.chasdb.gruppuppgift.models.*;
 import org.chasdb.gruppuppgift.repositories.OrderRepository;
+import org.chasdb.gruppuppgift.repositories.PaymentRepository;
 import org.chasdb.gruppuppgift.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class OrderService {
     @Autowired
     private OrderRepository orderRepository;
     @Autowired
+    private PaymentService paymentService;
+    @Autowired
     private ProductRepository productRepository;
+    @Autowired
+    private CustomerService customerService;
+    @Autowired
+    private ReservationService reservationService;
 
     /**
      * Skapar en tom order (items läggs till efteråt)
@@ -53,6 +60,47 @@ public class OrderService {
     public BigDecimal calculateTotal(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found"));
-        return order.getTotalPrice();
+        return order.calculatePriceOfProducts();
     }
+
+    @Transactional
+    public Order checkout(Customer c, List<Product> products, String paymentMethod){ //Chance Customer and Productlist to instead use the contents of the cart.
+
+        customerService.findCustomerByID(c.getId()).orElseThrow(()->new NoSuchElementException("Customer does not exist in DB"));
+
+        Order newOrder = new Order();
+        newOrder.setCustomer(c);
+        products.forEach(p-> newOrder.addOrderItem(p,1));
+        newOrder.setTotal_Price(newOrder.calculatePriceOfProducts());
+        Order savedOrder = orderRepository.save(newOrder);
+
+        Payment p = new Payment();
+        int attempts = 0;
+        while(attempts<4) {
+            try {
+                switch (paymentMethod) {
+                    case "CARD" -> p = paymentService.cardPay(savedOrder);
+                    case "INVOICE" -> p = paymentService.savePayment("INVOICE", "PENDING", savedOrder);
+                    default -> throw new IllegalArgumentException("Invalid payment method");
+                }
+                attempts = 4; //Pass and do not repeat
+            } catch (RuntimeException e) {
+                attempts++;
+
+            }
+        }
+
+        switch (p.getStatus()){
+            case "APPROVED" -> savedOrder.setStatus("PAID");
+        }
+
+
+        reservationService.deleteReservationByCustomerId(c.getId());
+        return newOrder;
+
+    }
+
+
+
+
 }
