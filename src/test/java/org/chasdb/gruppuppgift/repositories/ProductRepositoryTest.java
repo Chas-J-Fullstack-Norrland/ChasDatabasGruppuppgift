@@ -45,8 +45,8 @@ class ProductRepositoryTest {
 
         DBproduct = productRepository.save(newProduct);
         Product_in_Stock = productRepository.save(newProduct2);
-        inventoryRepository.updateQuantityBySku(DBproduct.getSku(), 20);
-        inventoryRepository.updateQuantityBySku(Product_in_Stock.getSku(), 2);
+        inventoryRepository.updateQuantityBySku(DBproduct.getSku(), 2);
+        inventoryRepository.updateQuantityBySku(Product_in_Stock.getSku(), 20);
     }
 
     @Test

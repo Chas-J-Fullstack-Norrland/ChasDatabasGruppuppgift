@@ -56,7 +56,6 @@ class ReportServiceTest {
     @Test
     void shouldFindLowStockProducts() {
         Product low = new Product("Low", "SKU-LOW", new BigDecimal("5"));
-        low.setQTY(1);
         productRepository.save(low);
         List<Product> products = reportService.getLowStockProducts(5);
 
