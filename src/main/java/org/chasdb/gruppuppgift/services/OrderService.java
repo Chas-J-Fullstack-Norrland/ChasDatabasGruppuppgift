@@ -45,14 +45,10 @@ public class OrderService {
                 .orElseThrow(() -> new IllegalArgumentException("Order not found"));
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
-        BigDecimal priceAtOrderTime = product.getPrice();
-        OrderItem item = new OrderItem(
-                order,
-                product,
-                quantity
-        );
+        OrderItem item = new OrderItem(order, product, quantity);
         order.getItems().add(item);
         return orderRepository.save(order);
+
     }
     /**
      * Totalpris (exakt)
