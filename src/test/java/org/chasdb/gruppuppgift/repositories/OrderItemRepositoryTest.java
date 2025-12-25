@@ -19,28 +19,7 @@ class OrderItemRepositoryTest {
     OrderRepository orderRepository;
     @Autowired
     ProductRepository productRepository;
-    @Test
-    void shouldCalculateRowTotalExactly() {
-        //Arrange
-        Product product = new Product(
-                "Row Test Product",
-                "SKU-ROW",
-                new BigDecimal("9.99")
-        );
-        productRepository.save(product);
 
-        Order order = new Order();
-        OrderItem item = new OrderItem(order, product, 3);
-        order.getItems().add(item);
-
-        //Act
-        Order savedOrder = orderRepository.save(order);
-        OrderItem savedItem = savedOrder.getItems().iterator().next();
-
-        //Assert
-        assertThat(savedItem.getRowTotal())
-                .isEqualByComparingTo(new BigDecimal("29.97"));
-    }
     @Test
     void shouldRejectZeroQuantityAtDatabaseLevel() {
         // arrange

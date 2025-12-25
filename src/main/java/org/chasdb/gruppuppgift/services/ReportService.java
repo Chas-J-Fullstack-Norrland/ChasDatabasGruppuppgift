@@ -1,5 +1,6 @@
 package org.chasdb.gruppuppgift.services;
 import org.chasdb.gruppuppgift.models.Product;
+import org.chasdb.gruppuppgift.models.ProductSalesDTO;
 import org.chasdb.gruppuppgift.repositories.OrderItemRepository;
 import org.chasdb.gruppuppgift.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;

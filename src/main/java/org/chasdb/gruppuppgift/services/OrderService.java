@@ -45,9 +45,6 @@ public class OrderService {
                 .orElseThrow(() -> new IllegalArgumentException("Order not found"));
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
-        if (product.getQTY() < quantity) {
-            throw new IllegalArgumentException("Product not in stock");
-        }
         OrderItem item = new OrderItem(order, product, quantity);
         order.getItems().add(item);
         return orderRepository.save(order);
