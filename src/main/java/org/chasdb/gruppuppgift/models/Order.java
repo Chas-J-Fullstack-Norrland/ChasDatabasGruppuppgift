@@ -1,26 +1,40 @@
 package org.chasdb.gruppuppgift.models;
-import jakarta.annotation.Nullable;
+
 import jakarta.persistence.*;
+import org.chasdb.gruppuppgift.models.enums.OrderStatus;
+import org.chasdb.gruppuppgift.models.enums.PaymentMethod;
+
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
 @Table(name = "orders")
 public class Order {
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @Column(nullable = false)
-    private BigDecimal total_Price = BigDecimal.valueOf(0);
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "customer_id", nullable = false)
+    private Customer customer;
+
+    @Column(name = "total_price", nullable = false)
+    private BigDecimal totalPrice = BigDecimal.valueOf(0);
 
     @Column(nullable = false, columnDefinition = "DATE default now()")
-    private LocalDate createdAt = LocalDate.now();
+    private LocalDateTime orderDate = LocalDateTime.now();
 
-    @Column(nullable = false,columnDefinition = "Varchar(10) default 'NEW' CHECK(status='NEW' OR status='PAID' OR status='CANCELED')")
-    private String status = "NEW";
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private OrderStatus status = OrderStatus.PENDING;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_method")
+    private PaymentMethod paymentMethod;
 
     @OneToMany(
             mappedBy = "order",
@@ -29,56 +43,77 @@ public class Order {
     )
     private Set<OrderItem> items = new HashSet<>();
 
+    public Order() {}
 
-
-    public Order() { }
-
-    public void setId(Long id) {
-        this.id = id;
+    public Order(Customer customer, LocalDateTime orderDate, OrderStatus status) {
+        this.customer = customer;
+        this.orderDate = orderDate;
+        this.status = status;
     }
 
-    public void setCreatedAt(LocalDate createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public void setItems(Set<OrderItem> items) {
-        this.items = items;
+    public void addOrderItem(OrderItem item) {
+        items.add(item);
+        item.setOrder(this);
     }
 
     public Long getId() {
         return id;
     }
-    public LocalDate getCreatedAt() {
-        return createdAt;
+
+    public void setId(Long id) {
+        this.id = id;
     }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
+    public BigDecimal getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    public LocalDateTime getOrderDate() {
+        return orderDate;
+    }
+
+    public void setOrderDate(LocalDateTime orderDate) {
+        this.orderDate = orderDate;
+    }
+
+    public OrderStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(OrderStatus status) {
+        this.status = status;
+    }
+
+    public PaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
     public Set<OrderItem> getItems() {
         return items;
     }
-    /** Affärsregel: order måste ha minst 1 item*/
-    @PrePersist
-    @PreUpdate
-    private void validateItems() {
-        if (items == null || items.isEmpty()) {
-            throw new IllegalStateException("Order must contain at least one OrderItem");
-        }
-    }
-    /** Exakt totalsumma (BigDecimal-safe)*/
-    public BigDecimal getTotalPrice() {
-        return items.stream()
-                .map(OrderItem::getRowTotal)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
-    public void addOrderItem(Product newProduct, int quantity) {
-        items.add(new OrderItem(this, newProduct, quantity));
+
+    public void setItems(List<OrderItem> itemList) {
+        this.items = new HashSet<>(itemList);
+        this.items.forEach(item -> item.setOrder(this));
     }
 
-    public BigDecimal getTotal_Price() {
-        return total_Price;
+    public void setItems(Set<OrderItem> items) {
+        this.items = items;
     }
-
-    public void setTotal_Price(BigDecimal total_Price) {
-        this.total_Price = total_Price;
-    }
-
-
 }

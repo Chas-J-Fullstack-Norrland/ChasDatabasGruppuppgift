@@ -3,6 +3,8 @@ package org.chasdb.gruppuppgift.models;
 import jakarta.persistence.*;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(
@@ -18,24 +20,38 @@ public class Reservation {
     private Long id;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "inventory_id", nullable = false)
     private Inventory inventory;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "customer_id",nullable = false)
     private Customer customer;
 
     @Column(nullable = false)
     private int quantity;
 
-    @Column(nullable = false)
-    private Instant reservedAt;
+    @Column(nullable = false, name = "reserved_at")
+    private LocalDateTime reservedAt;
 
-    private Instant expiresAt;
+    @Column(name = "expires_at")
+    private LocalDateTime expiresAt;
 
     @PrePersist
-    void onCreate() {
-        reservedAt = Instant.now();
+    protected void onCreate() {
+        if (this.reservedAt == null) {
+            this.reservedAt = LocalDateTime.now();
+        }
+        if (this.expiresAt == null) {
+            this.expiresAt = this.reservedAt.plusMinutes(15);
+        }
+    }
+
+    public Reservation() {}
+
+    public Reservation(Inventory inventory, Customer customer, int quantity) {
+        this.inventory = inventory;
+        this.customer = customer;
+        setQuantity(quantity);
     }
 
     public Long getId() {
@@ -67,22 +83,25 @@ public class Reservation {
     }
 
     public void setQuantity(int quantity) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Reservation quantity must be positive");
+        }
         this.quantity = quantity;
     }
 
-    public Instant getReservedAt() {
+    public LocalDateTime getReservedAt() {
         return reservedAt;
     }
 
-    public void setReservedAt(Instant reservedAt) {
+    public void setReservedAt(LocalDateTime reservedAt) {
         this.reservedAt = reservedAt;
     }
 
-    public Instant getExpiresAt() {
+    public LocalDateTime getExpiresAt() {
         return expiresAt;
     }
 
-    public void setExpiresAt(Instant expiresAt) {
+    public void setExpiresAt(LocalDateTime expiresAt) {
         this.expiresAt = expiresAt;
     }
 }

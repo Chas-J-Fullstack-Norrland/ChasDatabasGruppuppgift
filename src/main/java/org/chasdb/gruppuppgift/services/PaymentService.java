@@ -1,57 +1,59 @@
 package org.chasdb.gruppuppgift.services;
 
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.chasdb.gruppuppgift.models.Order;
 import org.chasdb.gruppuppgift.models.Payment;
+import org.chasdb.gruppuppgift.models.enums.PaymentMethod;
+import org.chasdb.gruppuppgift.models.enums.PaymentStatus;
 import org.chasdb.gruppuppgift.repositories.PaymentRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 
 @Service
 public class PaymentService {
 
-    @Autowired
-    private PaymentRepository repo;
+    private final PaymentRepository paymentRepository;
+
+    public PaymentService(PaymentRepository paymentRepository) {
+        this.paymentRepository = paymentRepository;
+    }
 
     @Transactional
-    public Payment invoicePay(Long paymentID){ //Used to pay pending invoices, Might not implement
+    public Payment invoicePay(Long paymentID) {
+        Payment payment = paymentRepository.findById(paymentID)
+                .orElseThrow(() -> new NoSuchElementException("No Payment with ID " + paymentID));
 
-        Payment payment = repo.findById(paymentID).orElseThrow(()->new NoSuchElementException("No Payment with ID "+paymentID));
-
-        if(Objects.equals(payment.getMethod(), "CARD")){
+        if (payment.getMethod() == PaymentMethod.CARD) {
             throw new IllegalStateException("Card Payments cannot be paid through invoice");
         }
-        if(Objects.equals(payment.getStatus(), "APPROVED")){
+        if (payment.getStatus() == PaymentStatus.APPROVED) {
             throw new IllegalStateException("Payment has already been completed");
         }
-        if(Objects.equals(payment.getStatus(), "DECLINED")){
-            throw new IllegalStateException("payment has previously been declined");
+        if (payment.getStatus() == PaymentStatus.DECLINED) {
+            throw new IllegalStateException("Payment has previously been declined");
         }
 
         Random r = new Random();
 
-        if(r.nextInt(10)<9) { //10% of failure
-            payment.setStatus("APPROVED");
-            return payment;
+        // 90% chans att lyckas
+        if (r.nextInt(10) < 9) {
+            payment.setStatus(PaymentStatus.APPROVED);
+
+            return paymentRepository.save(payment);
         } else {
             throw new RuntimeException("Something went wrong, Try again");
         }
-
-
     }
 
-    public Optional<Payment> findByID(Long id){
-        return repo.findById(id);
-    }
-    public Payment savePayment(String method, String status, Order order){
-        return repo.save(new Payment(method, status, order));
+    public Optional<Payment> findByID(Long id) {
+        return paymentRepository.findById(id);
     }
 
-
+    public Payment savePayment(PaymentMethod method, PaymentStatus status, Order order) {
+        return paymentRepository.save(new Payment(method, status, order));
+    }
 }

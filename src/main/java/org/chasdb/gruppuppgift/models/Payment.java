@@ -1,6 +1,8 @@
 package org.chasdb.gruppuppgift.models;
 
 import jakarta.persistence.*;
+import org.chasdb.gruppuppgift.models.enums.PaymentMethod;
+import org.chasdb.gruppuppgift.models.enums.PaymentStatus;
 
 import java.time.LocalDateTime;
 
@@ -10,25 +12,30 @@ public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     Long id;
-    @Column(nullable = false, columnDefinition = "varchar(10) CHECK(method='CARD' OR method='INVOICE')")
-    String method;
-    @Column(nullable = false, columnDefinition = "varchar(10) CHECK(status='PENDING' OR status='APPROVED' or status = 'DECLINED')")
-    String status;
 
-    @Column(nullable = false, columnDefinition = "TIMESTAMP default now()")
-    LocalDateTime timestamp = LocalDateTime.now();
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    PaymentMethod method;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    PaymentStatus status;
+
+    @Column(nullable = false)
+    private LocalDateTime timestamp;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "orders" ,referencedColumnName = "id")
-    Order order;
+    @JoinColumn(name = "order_id", nullable = false)
+    private Order order;
 
     public Payment() {
     }
 
-    public Payment(String method, String status, Order order) {
+    public Payment(PaymentMethod method, PaymentStatus status, Order order) {
         this.method = method;
         this.status = status;
         this.order = order;
+        this.timestamp = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -39,19 +46,19 @@ public class Payment {
         this.id = id;
     }
 
-    public String getMethod() {
+    public PaymentMethod getMethod() {
         return method;
     }
 
-    public void setMethod(String method) {
+    public void setMethod(PaymentMethod method) {
         this.method = method;
     }
 
-    public String getStatus() {
+    public PaymentStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(PaymentStatus status) {
         this.status = status;
     }
 

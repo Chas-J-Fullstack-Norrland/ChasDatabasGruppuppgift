@@ -1,104 +1,73 @@
 package org.chasdb.gruppuppgift.services;
 
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
 import org.chasdb.gruppuppgift.models.Customer;
 import org.chasdb.gruppuppgift.models.Inventory;
-import org.chasdb.gruppuppgift.models.Product;
 import org.chasdb.gruppuppgift.models.Reservation;
 import org.chasdb.gruppuppgift.repositories.CustomerRepository;
 import org.chasdb.gruppuppgift.repositories.InventoryRepository;
-import org.chasdb.gruppuppgift.repositories.ProductRepository;
 import org.chasdb.gruppuppgift.repositories.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 public class ReservationService {
 
-    @Autowired
-    InventoryRepository inventoryRepository;
-    @Autowired
-    CustomerRepository customerRepository;
-    @Autowired
-    ReservationRepository reservationRepository;
-    @Autowired
-    ProductRepository productRepository;
+    private final InventoryRepository inventoryRepository;
+    private final CustomerRepository customerRepository;
+    private final ReservationRepository reservationRepository;
 
-
-
+    @Autowired
+    public ReservationService(InventoryRepository inventoryRepository,
+                              CustomerRepository customerRepository,
+                              ReservationRepository reservationRepository) {
+        this.inventoryRepository = inventoryRepository;
+        this.customerRepository = customerRepository;
+        this.reservationRepository = reservationRepository;
+    }
 
     @Transactional
-    public Reservation reserveProduct(
-            String productsku,
-            String email,
-            int quantity
-    ) {
+    public Reservation reserveProduct(String productSku, String email, int quantity) {
 
-        Product product = productRepository.findBySku(productsku)
-                .orElseThrow(()-> new NoSuchElementException("No such productFound"));
+        Customer customer = customerRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Customer not found: " + email));
 
-        Inventory inventory = inventoryRepository.findById(product.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Inventory not found"));
+        Inventory inventory = inventoryRepository.findByProductSkuWithLock(productSku)
+                .orElseThrow(() -> new IllegalArgumentException("Product/Inventory not found for SKU: " + productSku));
 
-        if (inventory.getQty() < quantity) {
+        if (inventory.getQuantity() < quantity) {
             throw new IllegalStateException("Not enough stock available");
         }
 
-        // Find or create customer by email
-        Customer customer = customerRepository.findByEmail(email)
-                .orElseGet(() -> {
-                    Customer c = new Customer();
-                    c.setEmail(email);
-                    return customerRepository.save(c);
-                });
+        inventory.setQuantity(inventory.getQuantity() - quantity);
+        inventoryRepository.save(inventory);
 
-        // Decrease available stock
-        inventory.setQty(
-                inventory.getQty() - quantity
-        );
-
-        // Create reservation
-        Reservation reservation = new Reservation();
-        reservation.setInventory(inventory);
-        reservation.setCustomer(customer);
-        reservation.setQuantity(quantity);
+        Reservation reservation = new Reservation(inventory, customer, quantity);
 
         return reservationRepository.save(reservation);
     }
 
-
     @Transactional
     public void releaseReservation(Reservation r) {
         Inventory inv = r.getInventory();
-        inv.setQty(inv.getQty() + r.getQuantity());
+        inv.setQuantity(inv.getQuantity() + r.getQuantity());
         reservationRepository.delete(r);
     }
 
-    //Cancel a reservation and release stock
     @Transactional
     public void releaseReservationByID(Long reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
 
         Inventory inventory = reservation.getInventory();
-        inventory.setQty(
-                inventory.getQty() + reservation.getQuantity()
-        );
+        inventory.setQuantity(inventory.getQuantity() + reservation.getQuantity());
 
         reservationRepository.delete(reservation);
     }
 
-    //Get all reservations for a customer email
     public List<Reservation> getReservationsForCustomer(String email) {
         return reservationRepository.findByCustomerEmail(email);
     }
-
-
 }
-
-
-

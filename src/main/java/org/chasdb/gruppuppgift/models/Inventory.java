@@ -1,39 +1,53 @@
 package org.chasdb.gruppuppgift.models;
 
 import jakarta.persistence.*;
-import jakarta.persistence.criteria.CriteriaBuilder;
 
 @Entity
+@Table(name = "inventory")
 public class Inventory {
 
     @Id
     private Long id;
 
     @Column(nullable = false)
-    private int qty = 0;
+    private int quantity = 0;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @MapsId
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "product_id")
     private Product product;
 
-    public Inventory(){
+    public Inventory(){}
 
+    public Inventory(Product product, int quantity) {
+        this.product = product;
+        setQuantity(quantity);
     }
 
-    public Inventory(Product product_stock){
-        this.product = product_stock;
+    public Long getId() {
+        return id;
     }
 
-    public Inventory(int qty_in_stock){
-        this.qty = qty_in_stock;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public int getQty() {
-        return qty;
+    public int getQuantity() {
+        return quantity;
     }
 
-    public void setQty(int qty) {
-        this.qty = qty;
+    public void setQuantity(int quantity) {
+        if (quantity < 0) {
+            throw new IllegalArgumentException("Lagersaldo får inte vara negativt");
+        }
+        this.quantity = quantity;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
     }
 }

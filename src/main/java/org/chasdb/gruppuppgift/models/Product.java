@@ -3,7 +3,7 @@ package org.chasdb.gruppuppgift.models;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,7 +18,6 @@ public class Product {
     @Column(nullable = false,unique = true)
     private String sku;
 
-
     @Column(nullable = false)
     private String name;
 
@@ -31,38 +30,26 @@ public class Product {
     @Column(nullable = false)
     private boolean active = true;
 
-    @Column(nullable = false, columnDefinition = "DATE CHECK(created_at<=now())")
-    LocalDate createdAt = LocalDate.now();
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    @OneToOne(optional = false,mappedBy = "product", cascade = CascadeType.ALL)
-    Inventory inventory = new Inventory(this);
+    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+    private Inventory inventory;
 
-    @ManyToMany(cascade = CascadeType.PERSIST)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "product_category",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
     Set<Category> categories = new HashSet<>();
 
+    public Product() {}
 
-    public int getQTY() {
-        return inventory.getQty();
+    public Product(String name, String sku, BigDecimal price) {
+        this(name, sku, "", price);
     }
 
-    public void setQTY(int quantity) {
-        this.inventory.setQty(quantity);
-    }
-
-
-
-    public Product() {
-    }
-
-    public Product(
-            String name,
-            String sku,
-            BigDecimal price
-    ){
-        this.name = name;
-        this.sku = sku;
-        this.price = price;
-    }
     public Product(
             String name,
             String sku,
@@ -71,8 +58,32 @@ public class Product {
     ){
         this.name = name;
         this.sku = sku;
-        this.price = price;
         this.description = description;
+        this.price = price;
+        this.createdAt = LocalDateTime.now();
+        this.inventory = new Inventory(this, 0);
+    }
+
+    public void addCategory(Category category) {
+        this.categories.add(category);
+        category.getProducts().add(this);
+    }
+
+    public void removeCategory(Category category) {
+        this.categories.remove(category);
+        category.getProducts().remove(this);
+    }
+
+    public int getQuantity() {
+        return inventory != null ? inventory.getQuantity() : 0;
+    }
+
+    public void setQuantity(int quantity) {
+        if (this.inventory == null) {
+            this.inventory = new Inventory(this, quantity);
+        } else {
+            this.inventory.setQuantity(quantity);
+        }
     }
 
     public Set<Category> getCategories() {
@@ -81,10 +92,6 @@ public class Product {
 
     public void setCategories(Set<Category> categories) {
         this.categories = categories;
-    }
-
-    public void addCategory(Category category){
-        this.categories.add(category);
     }
 
     public Long getId() {
@@ -116,6 +123,9 @@ public class Product {
     }
 
     public void setPrice(BigDecimal price) {
+        if (price.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Priset måste vara större än 0");
+        }
         this.price = price;
     }
 
@@ -127,11 +137,11 @@ public class Product {
         this.active = active;
     }
 
-    public LocalDate getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDate createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -141,5 +151,12 @@ public class Product {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setInventory(Inventory inventory) {
+        this.inventory = inventory;
+        if (inventory != null && inventory.getProduct() != this) {
+            inventory.setProduct(this);
+        }
     }
 }
