@@ -1,7 +1,7 @@
 package org.chasdb.gruppuppgift.models;
 
 import jakarta.persistence.*;
-import jakarta.persistence.criteria.CriteriaBuilder;
+
 
 @Entity
 public class Inventory {
@@ -36,4 +36,8 @@ public class Inventory {
     public void setQty(int qty) {
         this.qty = qty;
     }
+
+    public Product getProduct() {return product;}
+
+
 }
