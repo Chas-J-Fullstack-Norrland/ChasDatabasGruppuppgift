@@ -1,5 +1,6 @@
 package org.chasdb.gruppuppgift;
 
+import org.chasdb.gruppuppgift.cli.AppRunner;
 import org.chasdb.gruppuppgift.models.Customer;
 import org.chasdb.gruppuppgift.models.Inventory;
 import org.chasdb.gruppuppgift.models.Product;
@@ -13,7 +14,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
@@ -32,6 +36,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ActiveProfiles("test")
 public class ECommerceScenarioTest {
 
     @Autowired private ProductService productService;
@@ -42,6 +48,9 @@ public class ECommerceScenarioTest {
     @Autowired private OrderRepository orderRepository;
     @Autowired private ReservationRepository reservationRepository;
     @Autowired private InventoryRepository inventoryRepository;
+
+    @MockitoBean
+    AppRunner runner;
 
     @BeforeEach
     void cleanup() {

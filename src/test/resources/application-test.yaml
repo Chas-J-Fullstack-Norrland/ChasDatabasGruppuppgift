@@ -1,14 +1,13 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:dbTest;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL
+    url: jdbc:postgresql://localhost:5432/db_grupp_test
+    # your dedicated test DB
     username: postgres
-    password: 123
-    driver-class-name: org.h2.Driver
+    password: ${PG_PASSWORD}
+    driver-class-name: org.postgresql.Driver
   jpa:
-    show-sql: false
     hibernate:
       ddl-auto: create-drop
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.H2Dialect
-        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect

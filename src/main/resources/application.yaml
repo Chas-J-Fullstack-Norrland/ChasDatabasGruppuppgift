@@ -2,11 +2,11 @@ spring:
   application:
     name: localhost
   datasource:
-    url: jdbc:postgresql://localhost:5432/dbTest
+    url: jdbc:postgresql://localhost:5432/db_grupp
     username: postgres
-    password: 123
+    password: pass
     driver-class-name: org.postgresql.Driver
   jpa:
-    hibernate.ddl-auto: create-drop
+    hibernate.ddl-auto: create
     properties.hibernate.format_sql: true
     hibernate.show-sql: true
