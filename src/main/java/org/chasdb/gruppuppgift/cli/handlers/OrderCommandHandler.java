@@ -85,7 +85,7 @@ public class OrderCommandHandler implements CommandHandler {
             System.out.println("BESTÄLLNING LAGD!");
             System.out.println("Order ID: " + order.getId());
             System.out.println("Status: " + order.getStatus());
-            System.out.println("Totalt: " + order.getTotalPrice() + " kr");
+            System.out.println("Totalt: " + order.getTotal_Price() + " kr");
             System.out.println("Kvitto skickat till " + email); // Simulering
 
         } catch (IllegalStateException e) {
@@ -136,8 +136,8 @@ public class OrderCommandHandler implements CommandHandler {
         for (Order o : orders) {
             System.out.printf("%-5d %-20s %-10s %-10s %-15s%n",
                     o.getId(),
-                    o.getOrderDate().toString().substring(0, 16),
-                    o.getTotalPrice(),
+                    o.getCreatedAt().toString().substring(0, 16),
+                    o.getTotal_Price(),
                     o.getStatus(),
                     o.getCustomer().getEmail());
         }
@@ -156,7 +156,7 @@ public class OrderCommandHandler implements CommandHandler {
 
             System.out.println("\n--- ORDER DETALJER: " + id + " ---");
             System.out.println("Kund: " + order.getCustomer().getName() + " (" + order.getCustomer().getEmail() + ")");
-            System.out.println("Datum: " + order.getOrderDate());
+            System.out.println("Datum: " + order.getCreatedAt());
             System.out.println("Status: " + order.getStatus());
             System.out.println("Betalsätt: " + order.getPaymentMethod());
             System.out.println("\nProdukter:");
@@ -165,9 +165,9 @@ public class OrderCommandHandler implements CommandHandler {
                 System.out.printf("- %dx %s (á %s kr)%n",
                         item.getQuantity(),
                         item.getProduct().getName(),
-                        item.getPriceAtPurchase());
+                        item.getUnitPrice());
             }
-            System.out.println("\nTOTALT: " + order.getTotalPrice() + " kr");
+            System.out.println("\nTOTALT: " + order.getTotal_Price() + " kr");
 
         } catch (NumberFormatException e) {
             System.out.println("ID måste vara en siffra.");
