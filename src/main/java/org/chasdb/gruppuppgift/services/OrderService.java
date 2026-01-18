@@ -3,6 +3,7 @@ package org.chasdb.gruppuppgift.services;
 import org.chasdb.gruppuppgift.models.*;
 import org.chasdb.gruppuppgift.models.enums.OrderStatus;
 import org.chasdb.gruppuppgift.models.enums.PaymentMethod;
+import org.chasdb.gruppuppgift.models.enums.PaymentStatus;
 import org.chasdb.gruppuppgift.repositories.InventoryRepository;
 
 import org.chasdb.gruppuppgift.repositories.OrderRepository;
@@ -28,82 +29,74 @@ public class OrderService {
     private final CartServiceContract cartServiceContract;
     private final ReservationService reservationService;
     private final PaymentService paymentService;
+    private final CustomerService customerService;
 
-    public OrderService(ProductRepository productRepository,
-                        OrderRepository orderRepository,
-                        InventoryRepository inventoryRepository,
-                        CartServiceContract cartServiceContract,
-                        ReservationService reservationService) {
+    public OrderService(
+            CustomerService customerService,
+            ProductRepository productRepository,
+            OrderRepository orderRepository,
+            InventoryRepository inventoryRepository,
+            CartServiceContract cartServiceContract,
+            ReservationService reservationService,
+            PaymentService paymentService
+    ) {
+        this.customerService = customerService;
         this.productRepository = productRepository;
         this.orderRepository = orderRepository;
         this.inventoryRepository = inventoryRepository;
         this.cartServiceContract = cartServiceContract;
         this.reservationService = reservationService;
-    }
-
-
-
-
-    public OrderService(ProductRepository productRepository,
-                        OrderRepository orderRepository,
-                        InventoryRepository inventoryRepository,
-                        CartServiceContract cartServiceContract,
-                        ReservationService reservationService) {
-        this.productRepository = productRepository;
-        this.orderRepository = orderRepository;
-        this.inventoryRepository = inventoryRepository;
-        this.cartServiceContract = cartServiceContract;
-        this.reservationService = reservationService;
+        this.paymentService = paymentService;
     }
 
     @Transactional
-    public Order processCheckout(String customerEmail, PaymentMethod paymentMethod) {
+    public Order processCheckout(String customerEmail, PaymentMethod paymentMethod) { //TODO! REWRITE!
         CartServiceContract.Cart cart = cartServiceContract.getCart(customerEmail);
 
         if (cart.items().isEmpty()) {
             throw new IllegalStateException("Kundvagnen är tom. Kan inte checka ut.");
         }
 
-        if (!simulatePayment()) {
-            throw new IllegalStateException("Betalning nekad (test). Försök igen.");
-        }
-
-        Order order = new Order();
-        order.setCustomer(cart.customer());
-        order.setOrderDate(LocalDateTime.now());
-        order.setStatus(OrderStatus.PAID);
+        Order order = new Order(cart.customer(),LocalDateTime.now(),OrderStatus.PENDING);
         order.setPaymentMethod(paymentMethod);
 
         order.setTotal_Price(BigDecimal.valueOf(cart.getTotalPrice()));
-
-        order = orderRepository.save(order);
 
         List<OrderItem> orderItems = new ArrayList<>();
 
         for (CartServiceContract.CartItem cartItem : cart.items()) {
             Product product = cartItem.product();
-
             OrderItem orderItem = new OrderItem(order, product, cartItem.quantity());
-
             orderItems.add(orderItem);
+        }
 
-            Inventory inventory = inventoryRepository.findByProduct(product)
-                    .orElseThrow(() -> new IllegalStateException("Lagersaldo saknas för produkt: " + product.getSku()));
 
-            if (inventory.getQty() < cartItem.quantity()) {
-                throw new IllegalStateException("Kritiskt fel: Lagersaldot är lägre än reservationen för " + product.getName());
-            }
+        order.setItems(orderItems);
+        orderRepository.save(order);
 
-            inventory.setQty(inventory.getQty() - cartItem.quantity());
-            inventoryRepository.save(inventory);
+        Payment p = new Payment();
+        int attempts = 0;
+        while(attempts<4) {
+            try {
+                switch (paymentMethod) {
+                    case PaymentMethod.CARD -> p = paymentService.cardPay(order);
+                    case PaymentMethod.INVOICE -> p = paymentService.savePayment(PaymentMethod.INVOICE, PaymentStatus.PENDING, order);
+                    default -> throw new IllegalArgumentException("Invalid payment method");
+                }
+                attempts = 4; //Pass and do not repeat
+            } catch (RuntimeException e) {
+                attempts++;
 
-            if (cartItem.reservationId() != null) {
-                reservationService.releaseReservationByID(cartItem.reservationId());
             }
         }
 
-        order.setItems(orderItems);
-        return orderRepository.save(order);
+        switch (p.getStatus()){
+            case PaymentStatus.APPROVED -> order.setStatus(OrderStatus.PAID);
+        }
+
+
+        reservationService.deleteReservationByCustomerId(cart.customer().getId());
+        return order;
     }
         /**
      * Skapar en tom order (items läggs till efteråt)
@@ -148,8 +141,9 @@ public class OrderService {
         return order.calculatePriceOfProducts();
     }
 
+
     @Transactional
-    public Order checkout(Customer c, List<Product> products, String paymentMethod){ //Chance Customer and Productlist to instead use the contents of the cart.
+    public Order checkout(Customer c, List<Product> products, String paymentMethod){ //Purely used for testing the order creation -> payment procedure.
 
         customerService.findCustomerByID(c.getId()).orElseThrow(()->new NoSuchElementException("Customer does not exist in DB"));
 
@@ -165,7 +159,7 @@ public class OrderService {
             try {
                 switch (paymentMethod) {
                     case "CARD" -> p = paymentService.cardPay(savedOrder);
-                    case "INVOICE" -> p = paymentService.savePayment("INVOICE", "PENDING", savedOrder);
+                    case "INVOICE" -> p = paymentService.savePayment(PaymentMethod.INVOICE, PaymentStatus.PENDING, savedOrder);
                     default -> throw new IllegalArgumentException("Invalid payment method");
                 }
                 attempts = 4; //Pass and do not repeat
@@ -176,7 +170,7 @@ public class OrderService {
         }
 
         switch (p.getStatus()){
-            case "APPROVED" -> savedOrder.setStatus("PAID");
+            case PaymentStatus.APPROVED -> savedOrder.setStatus(OrderStatus.PAID);
         }
 
 
@@ -212,7 +206,7 @@ public class OrderService {
                 .orElseThrow(() -> new IllegalArgumentException("Order hittades inte med ID: " + orderId));
 
         for (OrderItem item : order.getItems()) {
-            Inventory inventory = inventoryRepository.findByProduct_Sku(item.getProduct().getSku())
+            Inventory inventory = inventoryRepository.findByProduct_Sku(item.getProduct().getSku()) //Unnecceary check,  If product was persisted then inventory exists guaranteed.
                     .orElseThrow(() -> new IllegalStateException("Lager saknas för produkt: " + item.getProduct().getSku()));
 
             inventory.setQty(inventory.getQty() + item.getQuantity());

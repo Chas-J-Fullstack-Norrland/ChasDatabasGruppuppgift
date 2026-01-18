@@ -7,6 +7,7 @@ import org.chasdb.gruppuppgift.models.dto.TopProductDTO;
 import org.chasdb.gruppuppgift.repositories.InventoryRepository;
 import org.chasdb.gruppuppgift.repositories.OrderItemRepository;
 import org.chasdb.gruppuppgift.repositories.OrderRepository;
+import org.chasdb.gruppuppgift.repositories.ProductRepository;
 import org.springframework.data.domain.PageRequest;
 
 
@@ -32,13 +33,17 @@ public class ReportService {
     private final OrderItemRepository orderItemRepo;
     private final InventoryRepository inventoryRepo;
     private final OrderRepository orderRepo;
+    private final ProductRepository productRepo;
 
-    public ReportService(OrderItemRepository orderItemRepo,
-                         InventoryRepository inventoryRepo,
-                         OrderRepository orderRepo) {
+    public ReportService(
+            OrderItemRepository orderItemRepo,
+            InventoryRepository inventoryRepo,
+            OrderRepository orderRepo,
+            ProductRepository productRepo) {
         this.orderItemRepo = orderItemRepo;
         this.inventoryRepo = inventoryRepo;
         this.orderRepo = orderRepo;
+        this.productRepo = productRepo;
     }
     /** Topp 5 Bästsäljare*/
     public List<TopProductDTO> getTopSellingProducts(int limit) {
@@ -56,7 +61,7 @@ public class ReportService {
     }
     /** Produkter med Lågt lager*/
     public List<Product> getLowStockProducts(int limit) {//We are interested in product which owns the relation.
-        return productRepository.findByInventory_QtyLessThan(limit);
+        return productRepo.findByInventory_QtyLessThan(limit);
     }
 
     public List<DailyRevenueDTO> getRevenueReport(LocalDate from, LocalDate to) {

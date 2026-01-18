@@ -18,7 +18,7 @@ public class CustomerService {
     }
 
     @Transactional
-    public Customer addCustomer(String name, String email) {
+    public Customer registerCustomer(String name, String email) {
         if (name == null || name.isBlank()) throw new IllegalArgumentException("Namn krävs");
         if (email == null || email.isBlank()) throw new IllegalArgumentException("Email krävs");
 

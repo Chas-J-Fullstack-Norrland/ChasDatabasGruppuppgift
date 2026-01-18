@@ -3,7 +3,6 @@ package org.chasdb.gruppuppgift.services;
 import org.chasdb.gruppuppgift.models.Category;
 import org.chasdb.gruppuppgift.repositories.CategoryRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,8 +16,8 @@ public class CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
-    @Transactional
-    public Category addCategory(String name) {
+
+    public Category newCategory(String name) {
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("Kategorinamn får inte vara tomt");
         }

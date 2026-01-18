@@ -1,6 +1,7 @@
 package org.chasdb.gruppuppgift.services;
 
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.chasdb.gruppuppgift.models.Order;
@@ -50,7 +51,7 @@ public class PaymentService {
     public Payment cardPay(Order o){ //Used to pay off an order upon checkout.
 
 
-        if(repo.existsByOrderIdAndStatus(o.getId(),"APPROVED")){
+        if(repo.existsByOrderIdAndStatus(o.getId(),PaymentStatus.APPROVED)){
             throw new IllegalArgumentException("Order already paid");
         }
 
@@ -58,7 +59,7 @@ public class PaymentService {
             List<Payment> ExistingPayments = repo.findAllByOrderId(o.getId());
             ExistingPayments.forEach(payment -> {
                 if(payment.getStatus() == PaymentStatus.PENDING){
-                    payment.setStatus(PaymentStatus.CANCELLED);
+                    payment.setStatus(PaymentStatus.DECLINED);
                 }
             });
         }
@@ -87,20 +88,20 @@ public class PaymentService {
     public Payment cardPayFailure(Order o){ //Used to pay off an order upon checkout.
 
 
-        if(repo.existsByOrderIdAndStatus(o.getId(),"APPROVED")){
+        if(repo.existsByOrderIdAndStatus(o.getId(),PaymentStatus.APPROVED)){
             throw new IllegalArgumentException("Order already paid");
         }
 
-        if(repo.existsByOrderIdAndStatus(o.getId(),"PENDING")){
+        if(repo.existsByOrderIdAndStatus(o.getId(),PaymentStatus.PENDING)){
             List<Payment> ExistingPayments = repo.findAllByOrderId(o.getId());
             ExistingPayments.forEach(payment -> {
-                if(payment.getStatus().equals(PaymentMethod.PENDING)){
-                    payment.setStatus(PaymentStatus.CANCELED);
+                if(payment.getStatus() == PaymentStatus.PENDING){
+                    payment.setStatus(PaymentStatus.DECLINED);
                 }
             });
         }
 
-        Payment payment = new Payment(PaymentMethod.Card,PaymentStatus.Pending,o);
+        Payment payment = new Payment(PaymentMethod.CARD,PaymentStatus.PENDING,o);
 
         Random r = new Random();
 

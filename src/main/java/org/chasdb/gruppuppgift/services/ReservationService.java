@@ -20,13 +20,13 @@ import java.util.NoSuchElementException;
 public class ReservationService {
 
     @Autowired
-    InventoryRepository inventoryRepository;
+    private InventoryRepository inventoryRepository;
     @Autowired
-    CustomerRepository customerRepository;
+    private CustomerRepository customerRepository;
     @Autowired
-    ReservationRepository reservationRepository;
+    private ReservationRepository reservationRepository;
     @Autowired
-    ProductRepository productRepository;
+    private ProductRepository productRepository;
 
 
 
