@@ -3,6 +3,7 @@ package org.chasdb.gruppuppgift.cli.handlers;
 import org.chasdb.gruppuppgift.cli.CommandHandler;
 import org.chasdb.gruppuppgift.cli.CommandInput;
 import org.chasdb.gruppuppgift.models.Inventory;
+import org.chasdb.gruppuppgift.models.Product;
 import org.chasdb.gruppuppgift.models.dto.DailyRevenueDTO;
 import org.chasdb.gruppuppgift.models.dto.TopProductDTO;
 import org.chasdb.gruppuppgift.services.ReportService;
@@ -66,7 +67,7 @@ public class ReportCommandHandler implements CommandHandler {
         }
 
         System.out.println("\n--- LÅGT LAGER (< " + limit + " st) ---");
-        List<Inventory> lowStock = reportService.getLowStockProducts(limit);
+        List<Product> lowStock = reportService.getLowStockProducts(limit);
 
         if (lowStock.isEmpty()) {
             System.out.println("Inga produkter har lågt lager.");
@@ -75,11 +76,11 @@ public class ReportCommandHandler implements CommandHandler {
 
         System.out.printf("%-15s %-25s %-10s%n", "SKU", "Produkt", "Antal");
         System.out.println("------------------------------------------------");
-        for (Inventory inv : lowStock) {
+        for (Product p : lowStock) {
             System.out.printf("%-15s %-25s %-10d%n",
-                    inv.getProduct().getSku(),
-                    truncate(inv.getProduct().getName(), 24),
-                    inv.getQuantity());
+                    p.getSku(),
+                    truncate(p.getName(), 24),
+                    p.getQty());
         }
     }
 
