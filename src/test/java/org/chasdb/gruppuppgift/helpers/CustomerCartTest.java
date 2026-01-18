@@ -67,8 +67,8 @@ public class CustomerCartTest {
 
         List<CustomerCart.CartItem> items = customerCart.getItems();
         assertEquals(1, items.size());
-        assertEquals(productSku, items.get(0).getProduct().getSku());
-        assertEquals(2, items.get(0).getQuantity());
+        assertEquals(productSku, items.getFirst().getProduct().getSku());
+        assertEquals(2, items.getFirst().getQuantity());
     }
 
     @Test
@@ -89,7 +89,7 @@ public class CustomerCartTest {
 
         assertNotNull(customerCart.getCustomer());
         assertEquals(1, customerCart.getItems().size());
-        assertEquals(3, customerCart.getItems().get(0).getQuantity());
+        assertEquals(3, customerCart.getItems().getFirst().getQuantity());
     }
 
     @Autowired
