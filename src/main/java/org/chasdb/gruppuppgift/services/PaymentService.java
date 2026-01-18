@@ -5,8 +5,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.chasdb.gruppuppgift.models.Order;
 import org.chasdb.gruppuppgift.models.Payment;
+import org.chasdb.gruppuppgift.models.enums.PaymentMethod;
+import org.chasdb.gruppuppgift.models.enums.PaymentStatus;
 import org.chasdb.gruppuppgift.repositories.PaymentRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
@@ -23,21 +24,21 @@ public class PaymentService {
 
         Payment payment = repo.findById(paymentID).orElseThrow(()->new NoSuchElementException("No Payment with ID "+paymentID));
 
-        if(Objects.equals(payment.getMethod(), "CARD")){
+        if(payment.getMethod() == PaymentMethod.CARD){
             throw new IllegalStateException("Card Payments cannot be paid through invoice");
         }
-        if(Objects.equals(payment.getStatus(), "APPROVED")){
+        if (payment.getStatus() == PaymentStatus.APPROVED) {
             throw new IllegalStateException("Payment has already been completed");
         }
-        if(Objects.equals(payment.getStatus(), "DECLINED")){
-            throw new IllegalStateException("payment has previously been declined");
+        if (payment.getStatus() == PaymentStatus.DECLINED) {
+            throw new IllegalStateException("Payment has previously been declined");
         }
 
         Random r = new Random();
 
         if(r.nextInt(10)<9) { //10% of failure
-            payment.setStatus("APPROVED");
-            return payment;
+            payment.setStatus(PaymentStatus.APPROVED);
+            return payment; //Entity is managed, Will be flushed to DB upon Transactional Commit
         } else {
             throw new RuntimeException("Something went wrong, Try again");
         }
@@ -53,22 +54,22 @@ public class PaymentService {
             throw new IllegalArgumentException("Order already paid");
         }
 
-        if(repo.existsByOrderIdAndStatus(o.getId(),"PENDING")){
+        if(repo.existsByOrderIdAndStatus(o.getId(),PaymentStatus.PENDING)){
             List<Payment> ExistingPayments = repo.findAllByOrderId(o.getId());
             ExistingPayments.forEach(payment -> {
-                if(payment.getStatus().equals("PENDING")){
-                    payment.setStatus("CANCELLED");
+                if(payment.getStatus() == PaymentStatus.PENDING){
+                    payment.setStatus(PaymentStatus.CANCELLED);
                 }
             });
         }
 
-        Payment payment = new Payment("CARD","PENDING",o);
+        Payment payment = new Payment(PaymentMethod.CARD,PaymentStatus.PENDING,o);
 
         Random r = new Random();
 
         try{
             if(r.nextInt(10)<9) { //10% of failure
-                payment.setStatus("APPROVED");
+                payment.setStatus(PaymentStatus.APPROVED);
                 return payment = repo.save(payment);
             } else {
                 throw new RuntimeException("Something went wrong, Try again");
@@ -93,19 +94,19 @@ public class PaymentService {
         if(repo.existsByOrderIdAndStatus(o.getId(),"PENDING")){
             List<Payment> ExistingPayments = repo.findAllByOrderId(o.getId());
             ExistingPayments.forEach(payment -> {
-                if(payment.getStatus().equals("PENDING")){
-                    payment.setStatus("CANCELLED");
+                if(payment.getStatus().equals(PaymentMethod.PENDING)){
+                    payment.setStatus(PaymentStatus.CANCELED);
                 }
             });
         }
 
-        Payment payment = new Payment("CARD","PENDING",o);
+        Payment payment = new Payment(PaymentMethod.Card,PaymentStatus.Pending,o);
 
         Random r = new Random();
 
 
-        if(r.nextInt(10)<0) { //10% of failure
-            payment.setStatus("APPROVED");
+        if(r.nextInt(10)<0) { //Always false, Used for test
+            payment.setStatus(PaymentStatus.APPROVED);
             return payment = repo.save(payment);
         } else {
             failedPayment(payment);
@@ -118,11 +119,11 @@ public class PaymentService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void failedPayment(Payment p){
-        p.setStatus("DECLINED");
+        p.setStatus(PaymentStatus.DECLINED);
         repo.save(p);
     }
 
-    public Boolean paymentWithStatusExistsForOrderID(Long orderID,String status){
+    public Boolean paymentWithStatusExistsForOrderID(Long orderID,PaymentStatus status){
         return repo.existsByOrderIdAndStatus(orderID, status);
     }
 
@@ -130,12 +131,8 @@ public class PaymentService {
     public Optional<Payment> findByID(Long id){
         return repo.findById(id);
     }
-    public Payment savePayment(String method, String status, Order order){
+    public Payment savePayment(PaymentMethod method, PaymentStatus status, Order order){
         return repo.save(new Payment(method, status, order));
-    }
-
-    public void deletePayment(Payment p){
-        repo.delete(p);
     }
 
 

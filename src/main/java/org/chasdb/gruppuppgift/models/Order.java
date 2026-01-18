@@ -1,9 +1,13 @@
 package org.chasdb.gruppuppgift.models;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
+import org.chasdb.gruppuppgift.models.enums.OrderStatus;
+import org.chasdb.gruppuppgift.models.enums.PaymentMethod;
+
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -17,10 +21,15 @@ public class Order {
     private BigDecimal total_Price = BigDecimal.valueOf(0);
 
     @Column(nullable = false, columnDefinition = "DATE default now()")
-    private LocalDate createdAt = LocalDate.now();
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Column(nullable = false,columnDefinition = "Varchar(10) default 'NEW' CHECK(status='NEW' OR status='PAID' OR status='CANCELED')")
-    private String status = "NEW";
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private OrderStatus status = OrderStatus.NEW;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_method")
+    private PaymentMethod paymentMethod;
 
     @OneToMany(
             mappedBy = "order",
@@ -30,34 +39,67 @@ public class Order {
     private Set<OrderItem> items = new HashSet<>();
 
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Customer customer;
 
 
     public Order() { }
 
+
+    public Order(Customer customer, LocalDateTime orderDate, OrderStatus status) {
+        this.customer = customer;
+        this.createdAt = orderDate;
+        this.status = status;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
 
-    public void setCreatedAt(LocalDate createdAt) {
+    public Long getId() {
+        return id;
+    }
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
     public void setItems(Set<OrderItem> items) {
         this.items = items;
     }
-
-    public Long getId() {
-        return id;
-    }
-    public LocalDate getCreatedAt() {
-        return createdAt;
-    }
     public Set<OrderItem> getItems() {
         return items;
     }
+    public void addOrderItem(OrderItem item) {
+        items.add(item);
+        item.setOrder(this);
+    }
+
+    public void setItems(List<OrderItem> itemList) {
+        this.items = new HashSet<>(itemList);
+        this.items.forEach(item -> item.setOrder(this));
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public OrderStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(OrderStatus status) {
+        this.status = status;
+    }
+
+    public PaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
     /** Affärsregel: order måste ha minst 1 item*/
     @PrePersist
     @PreUpdate
@@ -82,14 +124,6 @@ public class Order {
 
     public void setTotal_Price(BigDecimal total_Price) {
         this.total_Price = total_Price;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
     public Customer getCustomer() {

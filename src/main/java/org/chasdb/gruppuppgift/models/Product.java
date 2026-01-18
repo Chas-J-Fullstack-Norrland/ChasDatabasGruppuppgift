@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -34,8 +35,8 @@ public class Product {
     @Column(nullable = false, columnDefinition = "DATE CHECK(created_at<=now())")
     LocalDate createdAt = LocalDate.now();
 
-    @OneToOne(optional = false,mappedBy = "product", cascade = CascadeType.ALL)
-    Inventory inventory = new Inventory(this);
+    @OneToOne(optional = false, cascade = CascadeType.ALL)
+    private Inventory inventory = new Inventory(this);
 
     @ManyToMany(cascade = CascadeType.PERSIST)
     Set<Category> categories = new HashSet<>();
@@ -49,9 +50,7 @@ public class Product {
             String sku,
             BigDecimal price
     ){
-        this.name = name;
-        this.sku = sku;
-        this.price = price;
+       this(name,sku,"",price);
     }
     public Product(
             String name,
@@ -62,7 +61,20 @@ public class Product {
         this.name = name;
         this.sku = sku;
         this.price = price;
-        this.description = description;
+        this.createdAt = LocalDate.now();
+        this.inventory = new Inventory(this, 0);
+    }
+
+    public void removeCategory(Category category) {
+        this.categories.remove(category);
+    }
+
+    public int getQty() {
+        return inventory != null ? inventory.getQty() : 0;
+    }
+
+    public void setQty(int qty) {
+            this.inventory.setQty(qty);
     }
 
     public Set<Category> getCategories() {
@@ -106,6 +118,9 @@ public class Product {
     }
 
     public void setPrice(BigDecimal price) {
+        if (price.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Priset måste vara större än 0");
+        }
         this.price = price;
     }
 

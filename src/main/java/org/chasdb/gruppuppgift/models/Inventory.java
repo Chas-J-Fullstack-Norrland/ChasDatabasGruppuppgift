@@ -1,7 +1,7 @@
 package org.chasdb.gruppuppgift.models;
 
 import jakarta.persistence.*;
-
+import jakarta.persistence.criteria.CriteriaBuilder;
 
 @Entity
 public class Inventory {
@@ -20,13 +20,13 @@ public class Inventory {
     public Inventory(){
 
     }
+    public Inventory(Product product, int quantity) {
+        this.product = product;
+        setQty(quantity);
+    }
 
     public Inventory(Product product_stock){
         this.product = product_stock;
-    }
-
-    public Inventory(int qty_in_stock){
-        this.qty = qty_in_stock;
     }
 
     public int getQty() {
@@ -34,6 +34,9 @@ public class Inventory {
     }
 
     public void setQty(int qty) {
+        if (qty < 0) {
+            throw new IllegalArgumentException("Lagersaldo får inte vara negativt");
+        }
         this.qty = qty;
     }
 

@@ -7,17 +7,14 @@ import java.time.LocalDateTime;
 @Entity
 @Table(
         name = "customers",
-uniqueConstraints = {
+        uniqueConstraints = {
                 @UniqueConstraint(columnNames = "email")
         }
-
 )
-
 public class Customer {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
-
 
     @Column(nullable = false)
     private String name;

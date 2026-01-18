@@ -50,11 +50,7 @@ public class ReservationService {
 
         // Find or create customer by email
         Customer customer = customerRepository.findByEmail(email)
-                .orElseGet(() -> {
-                    Customer c = new Customer();
-                    c.setEmail(email);
-                    return customerRepository.save(c);
-                });
+                .orElseThrow(() -> new IllegalArgumentException("Customer not found: " + email));
 
         // Decrease available stock
         inventory.setQty(
