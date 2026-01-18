@@ -3,11 +3,11 @@ package org.chasdb.gruppuppgift.models;
 
 import jakarta.persistence.*;
 
+
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "categories")
 public class Category {
 
     @Id
@@ -17,10 +17,10 @@ public class Category {
     @Column(nullable = false,unique = true)
     String name;
 
-    @ManyToMany(mappedBy = "categories")
-    Set<Product> products = new HashSet<>();
 
-    public Category(){}
+    public Category(){
+
+    }
 
     public Category(String name){
         this.name = name;
@@ -40,13 +40,5 @@ public class Category {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Set<Product> getProducts() {
-        return products;
-    }
-
-    public void setProducts(Set<Product> products) {
-        this.products = products;
     }
 }

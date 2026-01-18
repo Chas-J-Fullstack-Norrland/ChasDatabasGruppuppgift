@@ -119,7 +119,7 @@ public class Product {
 
     public void setPrice(BigDecimal price) {
         if (price.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Priset måste vara större än 0");
+            throw new IllegalArgumentException("Priset kan inte vara negativt");
         }
         this.price = price;
     }

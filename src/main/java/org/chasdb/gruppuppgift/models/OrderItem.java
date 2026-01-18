@@ -27,8 +27,16 @@ public class OrderItem {
     @Column(nullable = false, columnDefinition = "INTEGER CHECK(quantity > 0)")
     private int quantity;
 
-    @Column(name = "price_at_purchase", nullable = false, columnDefinition = "DECIMAL CHECK(price_at_purchase>=0)")
-    private BigDecimal priceAtPurchase;
+    @Column(nullable = false, columnDefinition = "DECIMAL CHECK(price_at_purchase>=0)")
+    private BigDecimal unitPrice;
+
+
+    /**
+     * Pris sparas per orderrad (historiskt korrekt)
+     */
+    @Column(nullable = false, columnDefinition = "DECIMAL CHECK(row_Total>=0)")
+    private BigDecimal rowTotal;
+
 
     public OrderItem() {}
 
@@ -47,15 +55,9 @@ public class OrderItem {
     public OrderItem(Order order, Product product, int quantity) {
         this.order = order;
         this.product = product;
-        setQuantity(quantity);
-        setPriceAtPurchase(product.getPrice());
-    }
-
-    public BigDecimal getRowTotal() {
-        if (priceAtPurchase == null || quantity <= 0) {
-            return BigDecimal.ZERO;
-        }
-        return priceAtPurchase.multiply(BigDecimal.valueOf(quantity));
+        this.quantity = quantity;
+        this.unitPrice = product.getPrice();
+        this.rowTotal = unitPrice.multiply(BigDecimal.valueOf(quantity));
     }
 
     public int getQuantity(){
@@ -81,14 +83,19 @@ public class OrderItem {
         this.quantity = quantity;
     }
 
-    public BigDecimal getPriceAtPurchase() {
-        return priceAtPurchase;
+    public void setRowTotal(BigDecimal rowTotal) {
+        this.rowTotal = rowTotal;
     }
 
-    public void setPriceAtPurchase(BigDecimal priceAtPurchase) {
-        if (priceAtPurchase == null || priceAtPurchase.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Price cannot be negative");
-        }
-        this.priceAtPurchase = priceAtPurchase;
+    public BigDecimal getRowTotal() {
+        return rowTotal;
+    }
+
+    public BigDecimal getUnitPrice() {
+        return unitPrice;
+    }
+
+    public void setUnitPrice(BigDecimal unitPrice) {
+        this.unitPrice = unitPrice;
     }
 }

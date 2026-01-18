@@ -2,11 +2,11 @@ package org.chasdb.gruppuppgift.models;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 @Entity
 @Table(
-        name = "inventory_reservations",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"inventory_id", "customer_id"})
         }
@@ -29,18 +29,18 @@ public class Reservation {
     private int quantity;
 
     @Column(nullable = false, name = "reserved_at")
-    private LocalDateTime reservedAt;
+    private Instant reservedAt; //Instant is safer for international use.
 
     @Column(name = "expires_at")
-    private LocalDateTime expiresAt;
+    private Instant expiresAt;
 
     @PrePersist
     protected void onCreate() {
         if (this.reservedAt == null) {
-            this.reservedAt = LocalDateTime.now();
+            this.reservedAt = Instant.now();
         }
         if (this.expiresAt == null) {
-            this.expiresAt = this.reservedAt.plusMinutes(15);
+            this.expiresAt = this.reservedAt.plus(15, ChronoUnit.MINUTES);
         }
     }
 
@@ -87,19 +87,19 @@ public class Reservation {
         this.quantity = quantity;
     }
 
-    public LocalDateTime getReservedAt() {
+    public Instant getReservedAt() {
         return reservedAt;
     }
 
-    public void setReservedAt(LocalDateTime reservedAt) {
+    public void setReservedAt(Instant reservedAt) {
         this.reservedAt = reservedAt;
     }
 
-    public LocalDateTime getExpiresAt() {
+    public Instant getExpiresAt() {
         return expiresAt;
     }
 
-    public void setExpiresAt(LocalDateTime expiresAt) {
+    public void setExpiresAt(Instant expiresAt) {
         this.expiresAt = expiresAt;
     }
 }
