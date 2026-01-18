@@ -10,5 +10,5 @@ import java.util.List;
 public interface ReservationRepository extends JpaRepository<Reservation,Long> {
 
     List<Reservation> findByCustomerEmail(String email);
-    List<Reservation> deleteAllByCustomerId(Long id);
+    void deleteAllByCustomerId(Long id);
 }
