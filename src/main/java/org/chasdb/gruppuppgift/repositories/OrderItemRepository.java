@@ -11,10 +11,10 @@ import java.util.List;
 public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
     //Top Sellers
     @Query("""
-            SELECT oi.product, SUM(oi.quantity)
+            SELECT oi.product, SUM(oi.qty)
             FROM OrderItem oi
             GROUP BY oi.product
-            ORDER BY SUM(oi.quantity) DESC
+            ORDER BY SUM(oi.qty) DESC
             """)
     List<Object[]> findTopSellingProducts(Pageable pageable);
     //Revenue per day

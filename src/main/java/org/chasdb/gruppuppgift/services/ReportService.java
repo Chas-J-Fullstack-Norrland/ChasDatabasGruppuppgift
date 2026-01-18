@@ -49,7 +49,7 @@ public class ReportService {
     public List<TopProductDTO> getTopSellingProducts(int limit) {
         Pageable pageable = PageRequest.of(0, limit);
 
-        List<Object[]> results = orderItemRepo.findTopSellingProductsRaw(pageable);
+        List<Object[]> results = orderItemRepo.findTopSellingProducts(pageable);
 
         return results.stream()
                 .map(row -> {

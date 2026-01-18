@@ -20,7 +20,7 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 
     Optional<Inventory> findByProduct(Product product);
 
-    List<Inventory> findByQuantityLessThan(int limit);
+    List<Inventory> findByQtyLessThan(int limit);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT i FROM Inventory i WHERE i.product.sku = :sku")
@@ -30,7 +30,7 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 
     @Modifying(clearAutomatically = true)
     @Transactional
-    @Query("UPDATE Inventory i SET i.quantity = i.quantity + :delta WHERE i.product.sku = :sku")
+    @Query("UPDATE Inventory i SET i.qty = i.qty + :delta WHERE i.product.sku = :sku")
     int updateQuantityBySku(@Param("sku") String sku,
                             @Param("delta") int delta);
 }

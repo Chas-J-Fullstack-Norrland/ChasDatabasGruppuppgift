@@ -18,7 +18,7 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
 
     List<Product> findByCategories_Name(String name);
 
-    List<Product> findByInventory_QuantityLessThan(int limit);
+    List<Product> findByInventory_QtyLessThan(int limit);
 
     @Transactional
     @Modifying(clearAutomatically = true)

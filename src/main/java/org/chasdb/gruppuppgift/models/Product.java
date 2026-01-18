@@ -35,12 +35,11 @@ public class Product {
     @Column(nullable = false, columnDefinition = "DATE CHECK(created_at<=now())")
     LocalDate createdAt = LocalDate.now();
 
-    @OneToOne(optional = false, cascade = CascadeType.ALL)
+    @OneToOne(optional = false, cascade = CascadeType.ALL,mappedBy = "product")
     private Inventory inventory = new Inventory(this);
 
     @ManyToMany(cascade = CascadeType.PERSIST)
     Set<Category> categories = new HashSet<>();
-
 
     public Product() {
     }

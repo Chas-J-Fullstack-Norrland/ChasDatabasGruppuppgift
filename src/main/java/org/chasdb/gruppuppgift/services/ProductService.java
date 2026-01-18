@@ -127,7 +127,7 @@ public class ProductService {
     }
 
     public List<Product> listProductsWithInventory_QtyLessThan(int limit){
-        return productRepository.findByInventory_QuantityLessThan(limit);
+        return productRepository.findByInventory_QtyLessThan(limit);
     }
 
     public void enableProduct(Long ID){

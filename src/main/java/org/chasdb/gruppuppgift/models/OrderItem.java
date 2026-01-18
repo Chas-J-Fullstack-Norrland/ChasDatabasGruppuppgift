@@ -24,10 +24,10 @@ public class OrderItem {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @Column(nullable = false, columnDefinition = "INTEGER CHECK(quantity > 0)")
-    private int quantity;
+    @Column(nullable = false, columnDefinition = "INTEGER CHECK(qty > 0)")
+    private int qty;
 
-    @Column(nullable = false, columnDefinition = "DECIMAL CHECK(price_at_purchase>=0)")
+    @Column(nullable = false, columnDefinition = "DECIMAL CHECK(unit_price>=0)")
     private BigDecimal unitPrice;
 
 
@@ -55,13 +55,13 @@ public class OrderItem {
     public OrderItem(Order order, Product product, int quantity) {
         this.order = order;
         this.product = product;
-        this.quantity = quantity;
+        this.qty = quantity;
         this.unitPrice = product.getPrice();
         this.rowTotal = unitPrice.multiply(BigDecimal.valueOf(quantity));
     }
 
     public int getQuantity(){
-        return quantity;
+        return qty;
     }
 
     public void setId(Long id) {
@@ -80,7 +80,7 @@ public class OrderItem {
         if (quantity <= 0) {
             throw new IllegalArgumentException("Quantity must be greater than 0");
         }
-        this.quantity = quantity;
+        this.qty = quantity;
     }
 
     public void setRowTotal(BigDecimal rowTotal) {
