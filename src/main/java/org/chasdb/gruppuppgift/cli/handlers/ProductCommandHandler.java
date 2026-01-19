@@ -2,10 +2,12 @@ package org.chasdb.gruppuppgift.cli.handlers;
 
 import org.chasdb.gruppuppgift.cli.CommandHandler;
 import org.chasdb.gruppuppgift.cli.CommandInput;
+import org.chasdb.gruppuppgift.models.Category;
 import org.chasdb.gruppuppgift.models.Product;
 import org.chasdb.gruppuppgift.services.ProductService;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Component
@@ -25,10 +27,62 @@ public class ProductCommandHandler implements CommandHandler {
     public void handle(CommandInput input) {
         switch (input.action()) {
             case "list" -> handleList(input);
-            case "add" -> System.out.println("Använd system import för att lägga till just nu");
+            case "add" -> addProduct(input);
             case "disable" -> handleDisable(input);
             default -> System.out.println("Okänd produkt-åtgärd.");
         }
+    }
+
+    private void addProduct(CommandInput input){
+        if(!input.flags().containsKey("name")){
+            System.out.println("Product require a name, include one with --name=");
+        }
+        if(input.flags().containsKey("sku")){
+            System.out.println("Product require an SKU identifier, include one with --sku=");
+        }
+        if(!input.flags().containsKey("price")){
+            System.out.println("Product require a non-negative price, include one with --price=");
+        }
+
+        BigDecimal price;
+        try{
+            price = new BigDecimal(input.flags().get("price"));
+        } catch (NumberFormatException e) {
+            System.err.println("could not parse value of price, ensure price is numeric");
+            return;
+        }
+
+        Product p = new Product(
+                input.flags().get("name"),
+                input.flags().get("sku"),
+                price
+                );
+        if(input.flags().containsKey("description")){
+            p.setDescription(input.flags().get("description"));
+        }
+        if(input.flags().containsKey("active")){
+            switch (input.flags().get("active")){
+                case "false" -> p.setActive(false);
+                //default -> p.setActive(true); // default is already true on entity level
+            }
+        }
+
+        if (!input.args().isEmpty()){
+            input.args().forEach(c-> p.addCategory(new Category(c)));
+        }
+
+        if (input.flags().containsKey("quantity")){
+            try{
+                int qty = Integer.parseInt(input.flags().get("quantity"));
+                p.setQty(qty);
+            } catch (NumberFormatException e) {
+                System.err.println("Invalid numeric for optional field 'quantity'");
+                return;
+            }
+        }
+
+        productService.saveProduct(p);
+
     }
 
     private void handleList(CommandInput input) {
