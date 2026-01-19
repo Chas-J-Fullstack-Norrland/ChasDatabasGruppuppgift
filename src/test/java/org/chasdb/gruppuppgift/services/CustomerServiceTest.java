@@ -1,14 +1,18 @@
 package org.chasdb.gruppuppgift.services;
 
 
+import org.chasdb.gruppuppgift.cli.AppRunner;
 import org.chasdb.gruppuppgift.models.Customer;
 
 import org.chasdb.gruppuppgift.repositories.CustomerRepository;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -22,6 +26,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @Transactional
 public class CustomerServiceTest {
 
+    @MockitoBean
+    AppRunner appRunner;
+
     @Autowired
     private CustomerService service;
 
@@ -29,6 +36,7 @@ public class CustomerServiceTest {
     private CustomerRepository repo;
 
     @Test
+    @Transactional
     void testRegisterAndFindCustomer() {
         Customer customer = service.registerCustomer("TestUser", "test@example.com");
         assertNotNull(customer.getId());
@@ -39,6 +47,7 @@ public class CustomerServiceTest {
     }
 
     @Test
+    @Transactional
     void testListCustomers() {
         service.registerCustomer("A", "a@example.com");
         service.registerCustomer("B", "b@example.com");
@@ -48,6 +57,7 @@ public class CustomerServiceTest {
     }
 
     @Test
+    @Transactional
     void testDeleteCustomer() {
         Customer customer = service.registerCustomer("DeleteMe", "deleteme@example.com");
         Long id = customer.getId();
