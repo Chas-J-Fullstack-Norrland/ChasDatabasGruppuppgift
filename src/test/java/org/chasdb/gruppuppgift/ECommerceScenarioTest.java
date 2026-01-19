@@ -39,7 +39,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
 public class ECommerceScenarioTest {
-
+    @MockitoBean
+    AppRunner appRunner;
     @Autowired private ProductService productService;
     @Autowired private ProductRepository productRepository;
     @Autowired private CustomerRepository customerRepository;
@@ -48,22 +49,28 @@ public class ECommerceScenarioTest {
     @Autowired private OrderRepository orderRepository;
     @Autowired private ReservationRepository reservationRepository;
     @Autowired private InventoryRepository inventoryRepository;
+    @Autowired private PaymentRepository paymentRepository;
+    @Autowired private OrderItemRepository orderItemRepository;
+
 
     @MockitoBean
     AppRunner runner;
 
-    @BeforeEach
-    void cleanup() {
-        reservationRepository.deleteAll();
-        orderRepository.deleteAll();
-        productRepository.deleteAll();
-        customerRepository.deleteAll();
-    }
+    @AfterEach
+     void cleanup() {
+         paymentRepository.deleteAll();
+         reservationRepository.deleteAll();
+         orderItemRepository.deleteAll();
+         orderRepository.deleteAll();
+         productRepository.deleteAll();
+         customerRepository.deleteAll();
+     }
+
 
     // --- SCENARIO 1: LITET (Import + Enkelt köp) ---
-    @Test
-    @Transactional
+    @Test //Arguably shouldnt be transactional due to import behavior
     @DisplayName("Scenario 1: Import av produkter och ett vanligt köp")
+
     void testScenario1_ImportAndBuy() {
         // Skapa CSV-data
         String csvContent = """
@@ -79,7 +86,7 @@ public class ECommerceScenarioTest {
 
         // Fyll på lagret
         productRepository.findAll().forEach(p -> {
-            p.setQuantity(5);
+            p.setQty(5);
             productRepository.save(p);
         });
 
@@ -111,7 +118,7 @@ public class ECommerceScenarioTest {
     void testScenario2_Concurrency() throws InterruptedException {
         // Skapa en produkt med saldo 1 (SISTA EXEMPLARET!)
         Product p = new Product("Guldklocka", "SKU-GOLD", new BigDecimal(5000));
-        p.setQuantity(1); // Bara 1 i lager
+        p.setQty(1); // Bara 1 i lager
         productRepository.save(p);
 
         // Skapa 5 kunder
@@ -150,12 +157,13 @@ public class ECommerceScenarioTest {
 
         // Kontrollera att lagret är 0 (reserverat)
         Inventory inv = inventoryRepository.findByProduct_Sku("SKU-GOLD").orElseThrow();
-        assertEquals(0, inv.getQuantity(), "Lagret ska vara 0");
+        assertEquals(0, inv.getQty(), "Lagret ska vara 0");
     }
 
     // --- SCENARIO 3: STORT (Stress Test) ---
     @Test
     @DisplayName("Scenario 3: Stress Test - 1000 produkter, 2000 ordrar")
+    @Transactional
     void testScenario3_StressTest() {
         long startTime = System.currentTimeMillis();
 
@@ -164,10 +172,10 @@ public class ECommerceScenarioTest {
         List<Product> products = new ArrayList<>();
         for (int i = 0; i < 1000; i++) {
             Product p = new Product("Prod-" + i, "SKU-" + i, new BigDecimal(100 + i));
-            p.setQuantity(10000); // Oändligt lager för testet
+            p.setQty(10000); // Oändligt lager för testet
             products.add(p);
         }
-        productRepository.saveAll(products);
+        products = productRepository.saveAll(products);
 
         // Generera 100 kunder
         System.out.println("Genererar kunder...");
@@ -175,7 +183,9 @@ public class ECommerceScenarioTest {
         for (int i = 0; i < 100; i++) {
             customers.add(new Customer("Stress" + i, "stress" + i + "@test.com"));
         }
-        customerRepository.saveAll(customers);
+        System.out.println(customerRepository.findAll().size());
+        customers = customerRepository.saveAll(customers);
+
 
         // Simulera 2000 köp
         System.out.println("Kör 2000 köp...");
