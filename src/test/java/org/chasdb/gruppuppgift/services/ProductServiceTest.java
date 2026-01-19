@@ -1,6 +1,7 @@
 package org.chasdb.gruppuppgift.services;
 
 import jakarta.transaction.Transactional;
+import org.chasdb.gruppuppgift.cli.AppRunner;
 import org.chasdb.gruppuppgift.models.Product;
 import org.chasdb.gruppuppgift.repositories.InventoryRepository;
 import org.chasdb.gruppuppgift.repositories.ProductRepository;
@@ -14,6 +15,7 @@ import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -26,6 +28,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles("test")
 class ProductServiceTest {
 
+    @MockitoBean
+    AppRunner appRunner;
     @Autowired
     ProductService productService;
     @Autowired
