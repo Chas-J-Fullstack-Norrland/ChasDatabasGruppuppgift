@@ -118,6 +118,10 @@ public class ProductService {
         return productRepository.findById(id);
     }
 
+    public Optional<Product> findProductBySKU(String sku){
+        return productRepository.findBySku(sku);
+    }
+
     public List<Product> listAllProducts(){
         return productRepository.findAll();
     }

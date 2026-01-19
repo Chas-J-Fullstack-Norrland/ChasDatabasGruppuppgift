@@ -1,5 +1,7 @@
 package org.chasdb.gruppuppgift.cli.handlers;
 
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import org.chasdb.gruppuppgift.cli.CommandHandler;
 import org.chasdb.gruppuppgift.cli.CommandInput;
 import org.chasdb.gruppuppgift.models.Category;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class ProductCommandHandler implements CommandHandler {
@@ -28,6 +31,7 @@ public class ProductCommandHandler implements CommandHandler {
         switch (input.action()) {
             case "list" -> handleList(input);
             case "add" -> addProduct(input);
+            case "edit" -> editProduct(input);
             case "disable" -> handleDisable(input);
             default -> System.out.println("Okänd produkt-åtgärd.");
         }
@@ -36,12 +40,15 @@ public class ProductCommandHandler implements CommandHandler {
     private void addProduct(CommandInput input){
         if(!input.flags().containsKey("name")){
             System.out.println("Product require a name, include one with --name=");
+            return;
         }
         if(input.flags().containsKey("sku")){
             System.out.println("Product require an SKU identifier, include one with --sku=");
+            return;
         }
         if(!input.flags().containsKey("price")){
             System.out.println("Product require a non-negative price, include one with --price=");
+            return;
         }
 
         BigDecimal price;
@@ -84,6 +91,43 @@ public class ProductCommandHandler implements CommandHandler {
         productService.saveProduct(p);
 
     }
+
+    @Transactional
+    private void editProduct(CommandInput input){
+        if(input.flags().containsKey("sku")){
+            System.out.println("Product require an SKU identifier, include one with --sku=");
+            return;
+        }
+
+        Product editedProduct;
+        try{
+            editedProduct = productService.findProductBySKU(input.flags().get("sku")).orElseThrow();
+        } catch (Exception e) {
+            System.err.println("Could not find product with that SKU");
+            return;
+        }
+
+        if(input.flags().containsKey("name")){
+            editedProduct.setName(input.flags().get("name"));
+        }
+        if(input.flags().containsKey("new-sku")){
+            editedProduct.setSku(input.flags().get("new-sku"));
+        }
+        if(input.flags().containsKey("description")){
+            editedProduct.setDescription(input.flags().get("description"));
+        }
+        try {
+            if(input.flags().containsKey("price")){
+                BigDecimal newPrice = new BigDecimal(input.flags().get("price"));
+                editedProduct.setPrice(newPrice);
+            }
+        }catch (Exception e){
+            System.err.println("invalid argument for field 'price'");
+            return;
+        }
+        System.out.println("Saved Product " + editedProduct.printString());
+    }
+
 
     private void handleList(CommandInput input) {
         List<Product> products;

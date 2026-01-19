@@ -33,13 +33,13 @@ public class Product {
     private boolean active = true;
 
     @Column(nullable = false)
-    LocalDate createdAt = LocalDate.now();
+    private LocalDate createdAt = LocalDate.now();
 
     @OneToOne(optional = false, cascade = CascadeType.ALL,mappedBy = "product")
     private Inventory inventory = new Inventory(this);
 
     @ManyToMany(cascade = CascadeType.PERSIST)
-    Set<Category> categories = new HashSet<>();
+    private Set<Category> categories = new HashSet<>();
 
     @PrePersist
     @PreUpdate
@@ -154,5 +154,18 @@ public class Product {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+
+    public String printString() {
+        return "Product{" +
+                "sku='" + sku + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", price=" + price +
+                ", id=" + id +
+                ", active=" + active +
+                ", createdAt=" + createdAt +
+                '}';
     }
 }
