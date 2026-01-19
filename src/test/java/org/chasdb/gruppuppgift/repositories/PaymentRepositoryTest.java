@@ -1,6 +1,8 @@
 package org.chasdb.gruppuppgift.repositories;
 
 import org.chasdb.gruppuppgift.models.*;
+import org.chasdb.gruppuppgift.models.enums.PaymentMethod;
+import org.chasdb.gruppuppgift.models.enums.PaymentStatus;
 import org.chasdb.gruppuppgift.services.CustomerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,7 +49,7 @@ class PaymentRepositoryTest {
         neworder.addOrderItem(testProduct,1);
         neworder.setCustomer(c);
         testOrder = orderRepo.save(neworder);
-        testPayment = repository.save(new Payment("CARD","APPROVED",testOrder));
+        testPayment = repository.save(new Payment(PaymentMethod.CARD, PaymentStatus.APPROVED,testOrder));
     }
 
     @Test
@@ -65,7 +67,7 @@ class PaymentRepositoryTest {
 
     @Test
     void updatePayment(){
-        testPayment.setMethod("INVOICE");
+        testPayment.setMethod(PaymentMethod.INVOICE);
         Payment paymentToUpdate = repository.save(testPayment);
         assertEquals(testPayment.getMethod(),entityManager.find(Payment.class,paymentToUpdate.getId()).getMethod());
     }

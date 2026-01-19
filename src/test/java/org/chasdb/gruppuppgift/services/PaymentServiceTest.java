@@ -1,10 +1,13 @@
 package org.chasdb.gruppuppgift.services;
 
 import jakarta.transaction.Transactional;
+import org.chasdb.gruppuppgift.cli.AppRunner;
 import org.chasdb.gruppuppgift.models.Customer;
 import org.chasdb.gruppuppgift.models.Order;
 import org.chasdb.gruppuppgift.models.Payment;
 import org.chasdb.gruppuppgift.models.Product;
+import org.chasdb.gruppuppgift.models.enums.PaymentMethod;
+import org.chasdb.gruppuppgift.models.enums.PaymentStatus;
 import org.chasdb.gruppuppgift.repositories.OrderRepository;
 import org.chasdb.gruppuppgift.repositories.ProductRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -13,7 +16,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.math.BigDecimal;
 
@@ -24,6 +29,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles("test")
 class PaymentServiceTest {
 
+    @MockitoBean
+    AppRunner appRunner;
     @Autowired
     PaymentService paymentService;
 
@@ -52,7 +59,7 @@ class PaymentServiceTest {
         neworder.setCustomer(testCustomer);
         neworder.addOrderItem(testProduct,1);
         testOrder = orderRepo.save(neworder);
-        testPayment = paymentService.savePayment("INVOICE","PENDING",testOrder);
+        testPayment = paymentService.savePayment(PaymentMethod.INVOICE, PaymentStatus.PENDING,testOrder);
     }
 
     @Test
@@ -71,7 +78,7 @@ class PaymentServiceTest {
             }
         }
         assertFalse(repeatUntilSuccessfulPayment);
-        assertEquals("APPROVED",paymentService.findByID(newPayment.getId()).get().getStatus());
+        assertEquals(PaymentStatus.APPROVED,paymentService.findByID(newPayment.getId()).get().getStatus());
     }
 
 
@@ -87,6 +94,6 @@ class PaymentServiceTest {
 
 
         assertThrows(RuntimeException.class,()->paymentService.cardPayFailure(order));
-        assertTrue(paymentService.paymentWithStatusExistsForOrderID(order.getId(), "DECLINED"));
+        assertTrue(paymentService.paymentWithStatusExistsForOrderID(order.getId(), PaymentStatus.DECLINED));
     }
 }
