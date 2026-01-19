@@ -10,6 +10,7 @@ import org.chasdb.gruppuppgift.services.CartServiceContract;
 import org.chasdb.gruppuppgift.services.OrderService;
 import org.chasdb.gruppuppgift.services.ProductService;
 import org.chasdb.gruppuppgift.util.CSVImporter;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -181,10 +182,8 @@ public class ECommerceScenarioTest {
         System.out.println("Genererar kunder...");
         List<Customer> customers = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
-            customers.add(new Customer("Stress" + i, "stress" + i + "@test.com"));
+            customers.add(customerRepository.save(new Customer("Stress" + i, "stress" + i + "@test.com")));
         }
-        System.out.println(customerRepository.findAll().size());
-        customers = customerRepository.saveAll(customers);
 
 
         // Simulera 2000 köp
