@@ -6,6 +6,9 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 @Entity
 public class Inventory {
 
+    @Version
+    private long version;
+
     @Id
     private Long id;
 

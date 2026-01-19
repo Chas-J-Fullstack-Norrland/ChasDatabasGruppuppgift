@@ -22,10 +22,6 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
 
     List<Inventory> findByQtyLessThan(int limit);
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT i FROM Inventory i WHERE i.product.sku = :sku")
-    Optional<Inventory> findByProductSkuWithLock(@Param("sku") String sku);
-
     Optional<Inventory> findByProduct_Sku(String sku);
 
     @Modifying(clearAutomatically = true)

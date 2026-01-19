@@ -53,8 +53,7 @@ class InventoryRepositoryTest {
 
         inventoryUpdate.get().setQty(2);
 
-        inventoryRepository.save(inventoryUpdate.get());
-
+        //No save since inventory is a managed entity here
         assertTrue(entityManager.find(Inventory.class,productList.getLast().getId()).getQty()==2);
 
 
