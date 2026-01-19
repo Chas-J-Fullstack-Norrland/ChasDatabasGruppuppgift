@@ -21,7 +21,7 @@ public class Reservation {
     @JoinColumn(name = "inventory_id", nullable = false)
     private Inventory inventory;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "customer_id",nullable = false)
     private Customer customer;
 

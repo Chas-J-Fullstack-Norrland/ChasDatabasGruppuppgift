@@ -1,7 +1,7 @@
 package org.chasdb.gruppuppgift.services;
 
 import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.chasdb.gruppuppgift.models.Customer;
 import org.chasdb.gruppuppgift.models.Inventory;
 import org.chasdb.gruppuppgift.models.Product;
@@ -12,6 +12,7 @@ import org.chasdb.gruppuppgift.repositories.ProductRepository;
 import org.chasdb.gruppuppgift.repositories.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -74,12 +75,10 @@ public class ReservationService {
         reservationRepository.delete(r);
     }
 
-    @Transactional
     public void releaseAllReservationsFromCustomer(Customer c) {
         reservationRepository.findByCustomerEmail(c.getEmail()).forEach(this::releaseReservation);
     }
 
-    @Transactional
     public void deleteReservationByCustomerId(Long id){
         reservationRepository.deleteAllByCustomerId(id);
     }
