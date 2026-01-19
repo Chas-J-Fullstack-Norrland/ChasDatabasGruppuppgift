@@ -72,10 +72,10 @@ public class ReportService {
 
         return rawData.stream()
                 .map(row -> {
-                    Date sqlDate = (Date) row[0];
+                    LocalDate sqlDate = (LocalDate) row[0];
                     BigDecimal total = (BigDecimal) row[1];
 
-                    return new DailyRevenueDTO(sqlDate.toLocalDate(), total);
+                    return new DailyRevenueDTO(sqlDate, total);
                 })
                 .collect(Collectors.toList());
     }
