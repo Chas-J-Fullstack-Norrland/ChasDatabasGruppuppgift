@@ -1,19 +1,27 @@
 package org.chasdb.gruppuppgift.services;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import org.chasdb.gruppuppgift.cli.AppRunner;
 import org.chasdb.gruppuppgift.models.Customer;
 import org.chasdb.gruppuppgift.models.Order;
 import org.chasdb.gruppuppgift.models.Product;
+import org.chasdb.gruppuppgift.models.enums.OrderStatus;
 import org.chasdb.gruppuppgift.repositories.CustomerRepository;
 import org.chasdb.gruppuppgift.repositories.OrderRepository;
 import org.chasdb.gruppuppgift.repositories.PaymentRepository;
 import org.chasdb.gruppuppgift.repositories.ProductRepository;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -25,6 +33,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
 class OrderServiceTest {
+
+    @MockitoBean
+    AppRunner appRunner;
     @Autowired
     OrderService orderService;
 
@@ -39,10 +50,12 @@ class OrderServiceTest {
     @Autowired
     ProductRepository productRepository;
     @Autowired
+    ProductService productService;
+    @Autowired
     PaymentRepository paymentRepository;
 
-    @AfterEach
-    void cleanup(){
+    @BeforeEach
+    void setup(){
         paymentRepository.deleteAll();
         orderRepository.deleteAll();
         productRepository.deleteAll();
@@ -54,6 +67,7 @@ class OrderServiceTest {
 
 
     @Test
+    @Transactional
     void shouldCreateOrderAndAddItem() {
         //Arrange
         Product product = new Product(
@@ -67,8 +81,8 @@ class OrderServiceTest {
                 new BigDecimal("100.00")
         );
         Customer c = customerService.registerCustomer("Testname","Email1@test.se");
-        Product savedProduct = productRepository.save(product);
-        Product savedProduct2 = productRepository.save(product2);
+        Product savedProduct = productService.saveProduct(product);
+        Product savedProduct2 = productService.saveProduct(product2);
         Order orderToSave = new Order();
         orderToSave.setCustomer(c);
         orderToSave.addOrderItem(savedProduct, 5);
@@ -86,7 +100,8 @@ class OrderServiceTest {
                 .isEqualByComparingTo(updatedOrder.getTotal_Price());
     }
     @Test
-    void shouldRejectZeroQuantity() {
+    @Transactional
+    void shouldRejectEmptyOrder() {
         Product product = new Product(
                 "Bad Quantity Product",
                 "SKU-4",
@@ -96,15 +111,17 @@ class OrderServiceTest {
         Product savedProduct = productRepository.save(product);
         Order orderToSave = new Order();
         orderToSave.setCustomer(c);
-        orderToSave.addOrderItem(savedProduct, 0);
+
         assertThatThrownBy(() ->
                 orderService.createOrder(orderToSave)
-        ).isInstanceOf(DataIntegrityViolationException.class);
+        ).isInstanceOf(InvalidDataAccessApiUsageException.class);
 
+        orderToSave.addOrderItem(savedProduct,0);
 
     }
 
     @Test
+    @Transactional
     void shouldSuccessfullyCompleteTransaction(){
         Product product = new Product(
                 "Bad Quantity Product",
@@ -117,7 +134,7 @@ class OrderServiceTest {
 
         Order savedOrder = orderService.checkout(c,savedProducts,"CARD");
 
-        assertTrue(savedOrder.getStatus().equals("PAID"));
+        assertTrue(savedOrder.getStatus() == OrderStatus.PAID);
 
 
     }

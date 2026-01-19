@@ -16,13 +16,13 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query(value = """
        SELECT 
-           CAST(order_date AS DATE), 
+           CAST(created_at AS DATE), 
            SUM(total_price)
        FROM orders
        WHERE status = 'PAID' 
-       AND order_date BETWEEN :startDate AND :endDate
-       GROUP BY CAST(order_date AS DATE)
-       ORDER BY CAST(order_date AS DATE) DESC
+       AND created_at BETWEEN :startDate AND :endDate
+       GROUP BY CAST(created_at AS DATE)
+       ORDER BY CAST(created_at AS DATE) DESC
        """, nativeQuery = true)
     List<Object[]> getDailyRevenue(@Param("startDate") LocalDateTime startDate,
                                    @Param("endDate") LocalDateTime endDate);
