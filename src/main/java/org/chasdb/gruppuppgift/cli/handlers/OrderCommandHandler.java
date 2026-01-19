@@ -94,7 +94,7 @@ public class OrderCommandHandler implements CommandHandler {
     }
 
     private void handleCancel(CommandInput input) {
-        String idStr = input.rawArgs().trim();
+        String idStr = input.args().getFirst();
         if (idStr.isEmpty()) {
             System.out.println("Ange Order ID för att makulera. T.ex: order cancel 5");
             return;
@@ -144,7 +144,7 @@ public class OrderCommandHandler implements CommandHandler {
     }
 
     private void handleShow(CommandInput input) {
-        String idStr = input.rawArgs().trim();
+        String idStr = input.args().getFirst();
         if (idStr.isEmpty()) {
             System.out.println("Ange Order ID.");
             return;

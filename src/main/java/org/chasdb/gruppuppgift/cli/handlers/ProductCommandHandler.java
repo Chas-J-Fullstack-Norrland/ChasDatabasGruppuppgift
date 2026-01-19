@@ -51,7 +51,7 @@ public class ProductCommandHandler implements CommandHandler {
     }
 
     private void handleDisable(CommandInput input) {
-        String sku = input.rawArgs().trim();
+        String sku = input.args().getFirst();
         if (sku.isEmpty()) {
             System.out.println("Du måste ange en SKU.");
             return;

@@ -73,15 +73,14 @@ public class CartCommandHandler implements CommandHandler {
             return;
         }
 
-        String[] args = input.rawArgs().split("\\s+");
-        if (args.length < 2) {
+        if (input.args().size() < 2) {
             System.out.println("Användning: cart add <sku> <qty>");
             return;
         }
 
-        String sku = args[0];
+        String sku = input.args().get(0);
         try {
-            int qty = Integer.parseInt(args[1]);
+            int qty = Integer.parseInt(input.args().get(1));
 
             cartService.addToCart(activeCustomerEmail, sku, qty);
             System.out.println("Lade till " + qty + " st " + sku + " i vagnen.");
@@ -97,7 +96,7 @@ public class CartCommandHandler implements CommandHandler {
             return;
         }
 
-        String sku = input.rawArgs().trim();
+        String sku = input.args().getFirst();
         if (sku.isEmpty()) {
             System.out.println("Ange SKU att ta bort.");
             return;

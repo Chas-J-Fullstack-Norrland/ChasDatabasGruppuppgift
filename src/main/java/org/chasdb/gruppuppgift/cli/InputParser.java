@@ -2,7 +2,9 @@ package org.chasdb.gruppuppgift.cli;
 
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -18,7 +20,7 @@ public class InputParser {
         String action = parts.length > 1 && !parts[1].startsWith("--") ? parts[1].toLowerCase() : "";
 
         Map<String, String> flags = new HashMap<>();
-        StringBuilder rawArgsBuilder = new StringBuilder();
+        List<String> args = new ArrayList<>();
 
         for (int i = 1; i < parts.length; i++) {
             String part = parts[i];
@@ -33,12 +35,11 @@ public class InputParser {
                     flags.put(part.substring(2), "true");
                 }
             } else if (i > 1 || action.isEmpty()) {
-                if (!rawArgsBuilder.isEmpty()) rawArgsBuilder.append(" ");
-                rawArgsBuilder.append(part);
+                args.add(part);
             }
         }
 
-        return new CommandInput(domain, action, flags, rawArgsBuilder.toString());
+        return new CommandInput(domain, action, flags, args);
     }
 
 }
