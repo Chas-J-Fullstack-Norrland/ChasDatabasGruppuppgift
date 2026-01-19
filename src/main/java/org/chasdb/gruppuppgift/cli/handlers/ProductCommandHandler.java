@@ -42,7 +42,7 @@ public class ProductCommandHandler implements CommandHandler {
             System.out.println("Product require a name, include one with --name=");
             return;
         }
-        if(input.flags().containsKey("sku")){
+        if(!input.flags().containsKey("sku")){
             System.out.println("Product require an SKU identifier, include one with --sku=");
             return;
         }
