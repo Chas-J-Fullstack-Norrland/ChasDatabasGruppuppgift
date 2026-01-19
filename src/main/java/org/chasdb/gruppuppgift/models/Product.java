@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Entity
@@ -158,6 +159,7 @@ public class Product {
 
 
     public String printString() {
+
         return "Product{" +
                 "sku='" + sku + '\'' +
                 ", name='" + name + '\'' +
@@ -166,6 +168,7 @@ public class Product {
                 ", id=" + id +
                 ", active=" + active +
                 ", createdAt=" + createdAt +
+                ", categories= " + categories.stream().map(Category::getName).collect(Collectors.joining(" "))+
                 '}';
     }
 }

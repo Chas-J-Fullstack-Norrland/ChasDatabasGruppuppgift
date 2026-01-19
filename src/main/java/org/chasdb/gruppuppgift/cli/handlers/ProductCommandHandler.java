@@ -104,7 +104,7 @@ public class ProductCommandHandler implements CommandHandler {
             editedProduct = productService.findProductBySKU(input.flags().get("sku")).orElseThrow();
         } catch (Exception e) {
             System.err.println("Could not find product with that SKU");
-            return;
+            throw e; //throw to initiate rollback of managed entity
         }
 
         if(input.flags().containsKey("name")){
@@ -123,7 +123,7 @@ public class ProductCommandHandler implements CommandHandler {
             }
         }catch (Exception e){
             System.err.println("invalid argument for field 'price'");
-            return;
+            throw e;
         }
         System.out.println("Saved Product " + editedProduct.printString());
     }
