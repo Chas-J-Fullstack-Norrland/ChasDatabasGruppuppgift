@@ -37,6 +37,14 @@ public class OrderItem {
     @Column(nullable = false, columnDefinition = "DECIMAL CHECK(row_Total>=0)")
     private BigDecimal rowTotal;
 
+    @PrePersist
+    @PreUpdate
+    private void validateItems() {
+        if (qty<1) {
+            throw new IllegalStateException("Order must contain at least one OrderItem");
+        }
+    }
+
 
     public OrderItem() {}
 
