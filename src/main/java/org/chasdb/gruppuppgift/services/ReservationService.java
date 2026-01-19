@@ -1,6 +1,7 @@
 package org.chasdb.gruppuppgift.services;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.OptimisticLockException;
 import org.springframework.transaction.annotation.Transactional;
 import org.chasdb.gruppuppgift.models.Customer;
 import org.chasdb.gruppuppgift.models.Inventory;
@@ -45,26 +46,39 @@ public class ReservationService {
         Inventory inventory = inventoryRepository.findById(product.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Inventory not found"));
 
-        if (inventory.getQty() < quantity) {
-            throw new IllegalStateException("Not enough stock available");
+        int attempts = 0;
+        while(true){
+            try{
+                if (inventory.getQty() < quantity) {
+                    throw new IllegalStateException("Not enough stock available");
+                }
+
+                // Find or create customer by email
+                Customer customer = customerRepository.findByEmail(email)
+                        .orElseThrow(() -> new IllegalArgumentException("Customer not found: " + email));
+
+                // Decrease available stock
+                inventory.setQty(
+                        inventory.getQty() - quantity
+                );
+
+                // Create reservation
+                Reservation reservation = new Reservation();
+                reservation.setInventory(inventory);
+                reservation.setCustomer(customer);
+                reservation.setQuantity(quantity);
+
+                return reservationRepository.save(reservation);
+            } catch (OptimisticLockException e) {
+                attempts++;
+                if(attempts>5){
+                    throw e; //Throw the exception upwards after 5 failed attempts
+                }
+            }
+
         }
 
-        // Find or create customer by email
-        Customer customer = customerRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("Customer not found: " + email));
 
-        // Decrease available stock
-        inventory.setQty(
-                inventory.getQty() - quantity
-        );
-
-        // Create reservation
-        Reservation reservation = new Reservation();
-        reservation.setInventory(inventory);
-        reservation.setCustomer(customer);
-        reservation.setQuantity(quantity);
-
-        return reservationRepository.save(reservation);
     }
 
 
