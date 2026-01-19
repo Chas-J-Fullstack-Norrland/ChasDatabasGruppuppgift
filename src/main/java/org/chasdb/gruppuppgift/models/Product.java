@@ -32,7 +32,7 @@ public class Product {
     @Column(nullable = false)
     private boolean active = true;
 
-    @Column(nullable = false, columnDefinition = "DATE CHECK(created_at<=now())")
+    @Column(nullable = false)
     LocalDate createdAt = LocalDate.now();
 
     @OneToOne(optional = false, cascade = CascadeType.ALL,mappedBy = "product")
@@ -40,6 +40,15 @@ public class Product {
 
     @ManyToMany(cascade = CascadeType.PERSIST)
     Set<Category> categories = new HashSet<>();
+
+    @PrePersist
+    @PreUpdate
+    public void validateCreatedAt() {
+        if (createdAt.isAfter(LocalDate.now())) {
+            throw new IllegalStateException("createdAt cannot be in the future");
+        }
+    }
+
 
     public Product() {
     }

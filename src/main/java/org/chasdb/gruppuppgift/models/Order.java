@@ -20,7 +20,7 @@ public class Order {
     @Column(nullable = false)
     private BigDecimal total_Price = BigDecimal.valueOf(0);
 
-    @Column(nullable = false, columnDefinition = "DATE default now()")
+    @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Enumerated(EnumType.STRING)
