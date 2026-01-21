@@ -3,11 +3,16 @@ package org.chasdb.gruppuppgift.util;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.chasdb.gruppuppgift.util.CSVPopulateUtils.CsvMapperRegistry;
+import org.chasdb.gruppuppgift.util.CSVPopulateUtils.mappers.CsvEntityMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +24,34 @@ public class CSVImporter {
 
     private static final Logger log = LoggerFactory.getLogger(CSVImporter.class);
     private static final int DEFAULT_BATCH_SIZE = 1000;
+
+    private final CsvMapperRegistry mapperRegistry;
+
+    public CSVImporter(CsvMapperRegistry mapperRegistry) {
+        this.mapperRegistry = mapperRegistry;
+    }
+
+
+
+    @Transactional
+    public void importCsv(InputStream inputStream) throws IOException {
+        Iterable<CSVRecord> records = CSVFormat.DEFAULT
+                .withFirstRecordAsHeader()
+                .parse(new InputStreamReader(inputStream));
+
+        for (CSVRecord record : records) {
+            String type = record.get("type");
+            CsvEntityMapper<Object> mapper = mapperRegistry.getMapper(type);
+            if(mapper==null){
+                System.out.println("TRIED LOADING MAPPER OF TYPE"+type);
+            }
+
+            Object entity = mapper.map(record);
+            if (entity != null) {
+                mapper.save(entity);
+            }
+        }
+    }
 
     public record ImportResult(int successCount, int failureCount, List<String> errors) {
         public boolean hasErrors() {

@@ -4,9 +4,11 @@ import org.chasdb.gruppuppgift.cli.CommandHandler;
 import org.chasdb.gruppuppgift.cli.CommandInput;
 import org.chasdb.gruppuppgift.models.Order;
 import org.chasdb.gruppuppgift.models.OrderItem;
+import org.chasdb.gruppuppgift.models.Payment;
 import org.chasdb.gruppuppgift.models.enums.OrderStatus;
 import org.chasdb.gruppuppgift.models.enums.PaymentMethod;
 import org.chasdb.gruppuppgift.services.OrderService;
+import org.chasdb.gruppuppgift.services.PaymentService;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -15,11 +17,13 @@ import java.util.List;
 public class OrderCommandHandler implements CommandHandler {
 
     private final OrderService orderService;
+    private final PaymentService paymentService;
 
     private String activeCustomerEmail = null;
 
-    public OrderCommandHandler(OrderService orderService) {
+    public OrderCommandHandler(OrderService orderService, PaymentService paymentService) {
         this.orderService = orderService;
+        this.paymentService = paymentService;
     }
 
     @Override
@@ -158,10 +162,13 @@ public class OrderCommandHandler implements CommandHandler {
             System.out.println("Kund: " + order.getCustomer().getName() + " (" + order.getCustomer().getEmail() + ")");
             System.out.println("Datum: " + order.getCreatedAt());
             System.out.println("Status: " + order.getStatus());
-            System.out.println("Betalsätt: " + order.getPaymentMethod());
+            System.out.println("Betalningar för "+order.getOrdercode());
+            paymentService.paymentsForOrder(order.getId()).forEach(
+                    payment-> System.out.println(" "+payment.getReference()+": "+payment.getMethod().toString())
+            );
             System.out.println("\nProdukter:");
 
-            for (OrderItem item : order.getItems()) {
+            for (OrderItem item : order.getItems().values()) {
                 System.out.printf("- %dx %s (á %s kr)%n",
                         item.getQuantity(),
                         item.getProduct().getName(),
