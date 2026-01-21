@@ -1,0 +1,46 @@
+type,name,email,createdAt,sku,description,price,active,qty,category,order,items,status,method,reference,expiresAt
+CATEGORY,Shirts,,,,,,,,,,,,,,,
+CATEGORY,Pants,,,,,,,,,,,,,,,
+CATEGORY,Shoes,,,,,,,,,,,,,,,
+CATEGORY,Hats,,,,,,,,,,,,,,,
+CATEGORY,Jackets,,,,,,,,,,,,,,,
+CATEGORY,Accessories,,,,,,,,,,,,,,,
+CATEGORY,Socks,,,,,,,,,,,,,,,
+CATEGORY,Outerwear,,,,,,,,,,,,,,,
+CATEGORY,Underwear,,,,,,,,,,,,,,,
+CATEGORY,Sportswear,,,,,,,,,,,,,,,
+CUSTOMER,Customer 1,customer1@example.com,2025-04-16T10:14:42.8275724,,,,,,,,,,,,,
+CUSTOMER,Customer 2,customer2@example.com,2025-06-16T10:14:42.8275724,,,,,,,,,,,,,
+CUSTOMER,Customer 3,customer3@example.com,2025-05-07T10:14:42.8275724,,,,,,,,,,,,,
+CUSTOMER,Customer 4,customer4@example.com,2025-02-09T10:14:42.8295755,,,,,,,,,,,,,
+CUSTOMER,Customer 5,customer5@example.com,2025-04-22T10:14:42.8295755,,,,,,,,,,,,,
+PRODUCT,Product 1,,2025-03-20,SKU1,Description for Product 1,117.004457,true,75,Accessories,,,,,
+PRODUCT,Product 2,,2025-06-15,SKU2,Description for Product 2,137.977867,false,15,Jackets,,,,,
+PRODUCT,Product 3,,2025-12-30,SKU3,Description for Product 3,484.908206,true,25,Socks|Pants,,,,,
+PRODUCT,Product 4,,2025-07-16,SKU4,Description for Product 4,408.281151,true,68,Socks,,,,,
+PRODUCT,Product 5,,2026-01-18,SKU5,Description for Product 5,131.590217,false,48,Outerwear|Accessories|Underwear,,,,,
+PRODUCT,Product 6,,2025-12-14,SKU6,Description for Product 6,415.682441,true,50,Shirts,,,,,
+PRODUCT,Product 7,,2025-12-27,SKU7,Description for Product 7,433.247678,false,24,Socks|Shoes,,,,,
+PRODUCT,Product 8,,2025-06-21,SKU8,Description for Product 8,290.112267,false,84,Socks|Accessories,,,,,
+PRODUCT,Product 9,,2025-08-04,SKU9,Description for Product 9,200.097465,false,68,Shirts|Jackets,,,,,
+PRODUCT,Product 10,,2025-02-05,SKU10,Description for Product 10,56.209190,false,21,Jackets,,,,,
+RESERVATION,,customer2@example.com,2025-08-11T09:14:42.829575500Z,SKU4,,,,5,,,,,,,2026-01-21T10:23:42.829575500Z
+RESERVATION,,customer5@example.com,2025-10-15T09:14:42.829575500Z,SKU9,,,,4,,,,,,,2026-01-21T11:17:42.829575500Z
+RESERVATION,,customer4@example.com,2025-04-17T09:14:42.829575500Z,SKU3,,,,5,,,,,,,2026-01-21T09:29:42.829575500Z
+RESERVATION,,customer5@example.com,2025-10-03T09:14:42.829575500Z,SKU5,,,,3,,,,,,,2026-01-21T10:29:42.829575500Z
+RESERVATION,,customer3@example.com,2025-10-16T09:14:42.829575500Z,SKU3,,,,3,,,,,,,2026-01-21T11:16:42.829575500Z
+RESERVATION,,customer4@example.com,2025-12-31T09:14:42.829575500Z,SKU4,,,,1,,,,,,,2026-01-21T10:55:42.829575500Z
+RESERVATION,,customer5@example.com,2025-05-15T09:14:42.829575500Z,SKU9,,,,3,,,,,,,2026-01-21T11:15:42.829575500Z
+RESERVATION,,customer5@example.com,2025-07-11T09:14:42.829575500Z,SKU3,,,,1,,,,,,,2026-01-21T10:56:42.829575500Z
+RESERVATION,,customer2@example.com,2025-12-02T09:14:42.829575500Z,SKU5,,,,1,,,,,,,2026-01-21T10:32:42.829575500Z
+RESERVATION,,customer1@example.com,2025-10-30T09:14:42.829575500Z,SKU7,,,,1,,,,,,,2026-01-21T10:50:42.829575500Z
+RESERVATION,,customer2@example.com,2025-07-10T09:14:42.829575500Z,SKU2,,,,2,,,,,,,2026-01-21T09:55:42.829575500Z
+RESERVATION,,customer5@example.com,2025-08-16T09:14:42.829575500Z,SKU7,,,,1,,,,,,,2026-01-21T10:23:42.829575500Z
+RESERVATION,,customer2@example.com,2025-09-23T09:14:42.829575500Z,SKU4,,,,5,,,,,,,2026-01-21T10:28:42.829575500Z
+RESERVATION,,customer4@example.com,2025-04-21T09:14:42.829575500Z,SKU2,,,,1,,,,,,,2026-01-21T09:56:42.829575500Z
+RESERVATION,,customer5@example.com,2025-10-27T09:14:42.829575500Z,SKU10,,,,2,,,,,,,2026-01-21T10:41:42.829575500Z
+RESERVATION,,customer3@example.com,2025-03-04T09:14:42.832535Z,SKU10,,,,1,,,,,,,2026-01-21T10:41:42.832535Z
+RESERVATION,,customer2@example.com,2025-11-01T09:14:42.832535Z,SKU2,,,,5,,,,,,,2026-01-21T10:19:42.832535Z
+RESERVATION,,customer1@example.com,2025-12-14T09:14:42.832535Z,SKU7,,,,2,,,,,,,2026-01-21T09:32:42.832535Z
+RESERVATION,,customer2@example.com,2025-03-21T09:14:42.832535Z,SKU2,,,,1,,,,,,,2026-01-21T10:00:42.832535Z
+RESERVATION,,customer2@example.com,2025-09-25T09:14:42.832535Z,SKU4,,,,1,,,,,,,2026-01-21T09:33:42.832535Z
