@@ -6,9 +6,7 @@ import org.chasdb.gruppuppgift.models.enums.PaymentMethod;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "orders")
@@ -16,6 +14,9 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
+
+    @Column
+    private String code;
 
     @Column(nullable = false)
     private BigDecimal total_Price = BigDecimal.valueOf(0);
@@ -27,16 +28,12 @@ public class Order {
     @Column(nullable = false)
     private OrderStatus status = OrderStatus.NEW;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "payment_method")
-    private PaymentMethod paymentMethod;
-
     @OneToMany(
             mappedBy = "order",
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    private Set<OrderItem> items = new HashSet<>();
+    private Map<String,OrderItem> items = new HashMap<>();
 
 
     @ManyToOne(optional = false)
@@ -64,20 +61,23 @@ public class Order {
         this.createdAt = createdAt;
     }
 
-    public void setItems(Set<OrderItem> items) {
+    public void setItems(Map<String,OrderItem> items) {
         this.items = items;
     }
-    public Set<OrderItem> getItems() {
+    public Map<String,OrderItem> getItems() {
         return items;
     }
     public void addOrderItem(OrderItem item) {
-        items.add(item);
         item.setOrder(this);
+        items.put(item.getProduct().getSku(),item);
     }
 
     public void setItems(List<OrderItem> itemList) {
-        this.items = new HashSet<>(itemList);
-        this.items.forEach(item -> item.setOrder(this));
+        this.items = new HashMap<>();
+        itemList.forEach(i->{
+            i.setOrder(this);
+            items.put(i.getProduct().getSku(),i);
+        });
     }
 
     public LocalDateTime getCreatedAt() {
@@ -92,13 +92,6 @@ public class Order {
         this.status = status;
     }
 
-    public PaymentMethod getPaymentMethod() {
-        return paymentMethod;
-    }
-
-    public void setPaymentMethod(PaymentMethod paymentMethod) {
-        this.paymentMethod = paymentMethod;
-    }
 
     /** Affärsregel: order måste ha minst 1 item*/
     @PrePersist
@@ -110,13 +103,14 @@ public class Order {
     }
    /** Exakt totalsumma (BigDecimal-safe) om du skulle köpt produkterna idag*/
     public BigDecimal calculatePriceOfProducts() {
-        return items.stream()
+        return items.values().stream()
                 .map(OrderItem::getRowTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
     public void addOrderItem(Product newProduct, int quantity) {
-        items.add(new OrderItem(this, newProduct, quantity));
+        items.put(newProduct.getSku(), new OrderItem(this, newProduct, quantity));
     }
+
 
     public BigDecimal getTotal_Price() {
         return total_Price;
@@ -132,5 +126,13 @@ public class Order {
 
     public void setCustomer(Customer customer) {
         this.customer = customer;
+    }
+
+    public String getOrdercode() {
+        return code;
+    }
+
+    public void setOrdercode(String code) {
+        this.code = code;
     }
 }

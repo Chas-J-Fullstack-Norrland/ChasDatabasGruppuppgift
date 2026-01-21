@@ -136,5 +136,7 @@ public class PaymentService {
         return repo.save(new Payment(method, status, order));
     }
 
+    public List<Payment> paymentsForOrder(Long id){return repo.findAllByOrderId(id);}
+
 
 }

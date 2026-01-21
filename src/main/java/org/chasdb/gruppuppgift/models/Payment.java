@@ -3,8 +3,12 @@ package org.chasdb.gruppuppgift.models;
 import jakarta.persistence.*;
 import org.chasdb.gruppuppgift.models.enums.PaymentMethod;
 import org.chasdb.gruppuppgift.models.enums.PaymentStatus;
+import org.apache.commons.text.RandomStringGenerator;
+
+
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 public class Payment {
@@ -27,6 +31,9 @@ public class Payment {
     @JoinColumn(name = "orders" ,referencedColumnName = "id", nullable = false)
     private Order order;
 
+    @Column(nullable = false,unique = true)
+    private String reference;
+
     public Payment() {
     }
 
@@ -34,6 +41,15 @@ public class Payment {
         this.method = method;
         this.status = status;
         this.order = order;
+    }
+
+    @PrePersist
+    private void assignReference(){
+        RandomStringGenerator generator = RandomStringGenerator.builder().get();
+        if(reference == null || reference.isBlank()){
+            reference = method.toString()+"-"+ generator.generate(10);
+        }
+
     }
 
     public Long getId() {
@@ -74,5 +90,13 @@ public class Payment {
 
     public void setOrder(Order order) {
         this.order = order;
+    }
+
+    public String getReference() {
+        return reference;
+    }
+
+    public void setReference(String reference) {
+        this.reference = reference;
     }
 }

@@ -90,6 +90,9 @@ public class OrderItem {
         }
         this.qty = quantity;
     }
+    public void addQuantity(int quantity) {
+        this.qty = qty + quantity;
+    }
 
     public void setRowTotal(BigDecimal rowTotal) {
         this.rowTotal = rowTotal;

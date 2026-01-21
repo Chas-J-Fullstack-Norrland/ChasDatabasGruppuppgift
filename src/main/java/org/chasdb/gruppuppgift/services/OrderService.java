@@ -23,6 +23,7 @@ import java.util.Random;
 @Service
 public class OrderService {
 
+    private final OrderNumberGenerator codeGenerator;
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
     private final InventoryRepository inventoryRepository;
@@ -32,6 +33,7 @@ public class OrderService {
     private final CustomerService customerService;
 
     public OrderService(
+            OrderNumberGenerator orderNumberGenerator,
             CustomerService customerService,
             ProductRepository productRepository,
             OrderRepository orderRepository,
@@ -40,6 +42,7 @@ public class OrderService {
             ReservationService reservationService,
             PaymentService paymentService
     ) {
+        this.codeGenerator = orderNumberGenerator;
         this.customerService = customerService;
         this.productRepository = productRepository;
         this.orderRepository = orderRepository;
@@ -58,7 +61,7 @@ public class OrderService {
         }
 
         Order order = new Order(cart.customer(),LocalDateTime.now(),OrderStatus.PENDING);
-        order.setPaymentMethod(paymentMethod);
+        order.setOrdercode(codeGenerator.next());
 
         order.setTotal_Price(BigDecimal.valueOf(cart.getTotalPrice()));
 
@@ -103,6 +106,7 @@ public class OrderService {
      */
 
     public Order createOrder(Order newOrder) {
+        newOrder.setOrdercode(codeGenerator.next());
         return orderRepository.save(newOrder);
     }
     /**
@@ -126,7 +130,7 @@ public class OrderService {
                 product,
                 quantity
         );
-        order.getItems().add(item);
+        order.getItems().put(item.getProduct().getSku(),item);
 
         return orderRepository.save(order);
 
@@ -148,6 +152,7 @@ public class OrderService {
         customerService.findCustomerByID(c.getId()).orElseThrow(()->new NoSuchElementException("Customer does not exist in DB"));
 
         Order newOrder = new Order();
+        newOrder.setOrdercode(codeGenerator.next());
         newOrder.setCustomer(c);
         products.forEach(p-> newOrder.addOrderItem(p,1));
         newOrder.setTotal_Price(newOrder.calculatePriceOfProducts());
@@ -179,13 +184,13 @@ public class OrderService {
 
     }
 
-
-
-
-
     public Order findOrderById(Long id) {
         return orderRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Order hittades inte: " + id));
+                .orElseThrow(() -> new NoSuchElementException("Order hittades inte: " + id));
+    }
+    public Order findOrderByCode(String code){
+        return orderRepository.findByCode(code)
+                .orElseThrow(() -> new NoSuchElementException("No order with code "+code));
     }
 
     public List<Order> listOrdersByStatus(OrderStatus status) {
@@ -205,7 +210,7 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order hittades inte med ID: " + orderId));
 
-        for (OrderItem item : order.getItems()) {
+        for (OrderItem item : order.getItems().values()) {
             Inventory inventory = inventoryRepository.findByProduct_Sku(item.getProduct().getSku()) //Unnecceary check,  If product was persisted then inventory exists guaranteed.
                     .orElseThrow(() -> new IllegalStateException("Lager saknas för produkt: " + item.getProduct().getSku()));
 
