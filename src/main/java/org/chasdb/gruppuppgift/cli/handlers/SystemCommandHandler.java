@@ -4,6 +4,7 @@ import org.chasdb.gruppuppgift.cli.CommandHandler;
 import org.chasdb.gruppuppgift.cli.CommandInput;
 import org.chasdb.gruppuppgift.repositories.*;
 import org.chasdb.gruppuppgift.services.ProductService;
+import org.chasdb.gruppuppgift.util.CSVGenerator;
 import org.chasdb.gruppuppgift.util.CSVImporter;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Component
 public class SystemCommandHandler implements CommandHandler {
@@ -23,6 +27,7 @@ public class SystemCommandHandler implements CommandHandler {
     private final PaymentRepository paymentRepository;
     private final ReservationRepository reservationRepository;
     private final CategoryRepository categoryRepository;
+    private final CSVImporter csvImporter;
 
     public SystemCommandHandler(ProductService productService,
                                 OrderRepository orderRepository,
@@ -31,7 +36,7 @@ public class SystemCommandHandler implements CommandHandler {
                                 InventoryRepository inventoryRepository,
                                 PaymentRepository paymentRepository,
                                 ReservationRepository reservationRepository,
-                                CategoryRepository categoryRepository) {
+                                CategoryRepository categoryRepository, CSVImporter csvImporter) {
         this.productService = productService;
         this.orderRepository = orderRepository;
         this.productRepository = productRepository;
@@ -40,6 +45,7 @@ public class SystemCommandHandler implements CommandHandler {
         this.paymentRepository = paymentRepository;
         this.reservationRepository = reservationRepository;
         this.categoryRepository = categoryRepository;
+        this.csvImporter = csvImporter;
     }
 
     @Override
@@ -50,10 +56,26 @@ public class SystemCommandHandler implements CommandHandler {
     @Override
     public void handle(CommandInput input) {
         switch (input.action()) {
-            case "import" -> handleImport(input);
+            case "import" -> importCSV(input);
             case "reset" -> handleReset();
             case "help" -> printHelp();
+            case "csvgenerate" -> csvGenerate(input);
             default -> System.out.println("Okänd system-åtgärd: " + input.action());
+        }
+    }
+
+    private void importCSV(CommandInput input){
+
+        if(!input.flags().containsKey("file") || input.flags().get("file").isBlank()){
+                System.out.println("Mandatory flag --file=<path> not set");
+                return;
+        }
+
+        Path path = Paths.get(input.flags().get("file"));
+        try{
+            csvImporter.importCsv(Files.newInputStream(path));
+        } catch (IOException e) {
+            System.err.println("Could not read file");
         }
     }
 
@@ -74,6 +96,7 @@ public class SystemCommandHandler implements CommandHandler {
         System.out.println("Påbörjar import av: " + filePath);
 
         try (FileInputStream fis = new FileInputStream(file)) {
+
             CSVImporter.ImportResult result = productService.importProducts(fis);
 
             System.out.println("Import klar");
@@ -141,9 +164,9 @@ public class SystemCommandHandler implements CommandHandler {
         System.out.println("  cart checkout --email=<email>                         - Gå till kassan och skapa order");
 
         System.out.println("\nRapporter:");
-        System.out.println("  report revenue                                 - Visa total försäljning per dag");
-        System.out.println("  report top                                     - Visa topp 10 mest sålda produkter");
-        System.out.println("  report low-stock --lt=<limit>                  - Visa producter med lågt inventarie");
+        System.out.println("  report revenue --from=<YYYY-MM-DD> -to=<YYYY-MM-DD    - Visa total försäljning per dag");
+        System.out.println("  report top                                            - Visa topp 10 mest sålda produkter");
+        System.out.println("  report low-stock --lt=<limit>                         - Visa producter med lågt inventarie");
 
         System.out.println("\nOrdrar:");
         System.out.println("  order list [--status=PAID]                      - Visa ordrar");
@@ -152,4 +175,25 @@ public class SystemCommandHandler implements CommandHandler {
 
         System.out.println("\n------------------------------");
     }
+
+    private void csvGenerate(CommandInput input){
+        CSVGenerator generator = new CSVGenerator() ;
+        String filename = "csvfile";
+
+        generator.setVariant(Integer.parseInt(input.flags().get("variant")));
+
+        if(input.flags().containsKey("file")){
+                filename = input.flags().get("file");
+        }
+
+        try{
+            generator.GenerateCSV(filename);
+        } catch (IOException e) {
+            System.err.println("Something went wrong");
+        }
+
+
+
+    }
+
 }

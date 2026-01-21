@@ -5,7 +5,11 @@ import org.chasdb.gruppuppgift.cli.CommandInput;
 import org.chasdb.gruppuppgift.models.Customer;
 import org.chasdb.gruppuppgift.services.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import javax.swing.*;
+
+@Component
 public class CustomerCommandHandler implements CommandHandler {
 
     @Autowired
