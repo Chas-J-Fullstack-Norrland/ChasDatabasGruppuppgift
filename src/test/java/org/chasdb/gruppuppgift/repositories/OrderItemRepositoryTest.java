@@ -31,7 +31,8 @@ class OrderItemRepositoryTest {
         productRepository.save(product);
         Order order = new Order();
         OrderItem item = new OrderItem(order, product, 0); //Invalid
-        order.getItems().add(item);
+        order.addOrderItem(item);
+
 
         //Act + Assert
         assertThatThrownBy(() ->

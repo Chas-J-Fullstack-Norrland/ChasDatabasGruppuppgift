@@ -49,8 +49,8 @@ class OrderRepositoryTest {
         order.setCustomer(customer);
         OrderItem item1 = new OrderItem(order, product,2);
         OrderItem item2 = new OrderItem(order, product2,1);
-        order.getItems().add(item1);
-        order.getItems().add(item2);
+        order.addOrderItem(item1);
+        order.addOrderItem(item2);
         order.setTotal_Price(order.calculatePriceOfProducts());
 
         //Act
