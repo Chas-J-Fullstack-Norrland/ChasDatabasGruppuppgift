@@ -148,8 +148,12 @@ public class SystemCommandHandler implements CommandHandler {
         System.out.println("  system import --file=<sökväg>                  - Importera produkter från CSV");
         System.out.println("  system reset                                   - Töm hela databasen (VARNING!)");
 
+        System.out.println("\n  Kategorier:");
+        System.out.println("    category add <args=categories>                           -lägg till kategorier");
+        System.out.println("    category list                                           - Visa alla kategorier");
+
         System.out.println("\n  Produkter:");
-        System.out.println("    product add                                     - Sök efter en produkt"+
+        System.out.println("    product add                                     - lägg till en produkt"+
                             "\n     --name=<sökord> --sku=<identifier> --price=<0.0>  "+
                             "\n     [--description] [args=categories] ");
         System.out.println("  product list                                   - Visa alla produkter i lager");
@@ -161,7 +165,6 @@ public class SystemCommandHandler implements CommandHandler {
         System.out.println("  cart remove--sku=<sku>                                - Ta bort produkt från varukorgen");
         System.out.println("  cart add --email=<email> --sku=<sku> --qty=<n>        - Lägg produkt i varukorgen");
         System.out.println("  cart show --email=<email>                             - Visa innehållet i varukorgen");
-        System.out.println("  cart checkout --email=<email>                         - Gå till kassan och skapa order");
 
         System.out.println("\nRapporter:");
         System.out.println("  report revenue --from=<YYYY-MM-DD> -to=<YYYY-MM-DD    - Visa total försäljning per dag");
@@ -172,6 +175,7 @@ public class SystemCommandHandler implements CommandHandler {
         System.out.println("  order list [--status=PAID]                      - Visa ordrar");
         System.out.println("  order show <id>                                 - Visa detaljer för en order");
         System.out.println("  order cancel <id>                               - Makulera order & återställ lager (Retur)"); // <--- NYTT
+        System.out.println("  order checkout --customer=<customer email> --method=<CARD/INVOCE>"         );
 
         System.out.println("\n------------------------------");
     }
