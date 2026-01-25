@@ -1,4 +1,4 @@
-# Ett gruppprojekt för en EHandels platform.
+# Ett grupprojekt för en EHandels platform.
 
 Meningen med uppgiften är att visa allt som lärts under kursen.
 Och visa att man kan hantera större datamängder.
