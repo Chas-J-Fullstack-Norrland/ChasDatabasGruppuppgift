@@ -48,7 +48,7 @@ public class CSVGenerator {
             default -> {
                 amountToGenerate.put("CUSTOMER",5000);
                 amountToGenerate.put("PRODUCT",10000);
-                amountToGenerate.put("ORDERS",200000);
+                amountToGenerate.put("ORDERS",20000);
             }
 
         }

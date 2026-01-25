@@ -1,5 +1,6 @@
 package org.chasdb.gruppuppgift.util;
 
+import jakarta.persistence.EntityManager;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -26,9 +27,10 @@ public class CSVImporter {
     private static final int DEFAULT_BATCH_SIZE = 1000;
 
     private final CsvMapperRegistry mapperRegistry;
+    private final EntityManager em;
 
-    public CSVImporter(CsvMapperRegistry mapperRegistry) {
-        this.mapperRegistry = mapperRegistry;
+    public CSVImporter(CsvMapperRegistry mapperRegistry, EntityManager em) {
+        this.mapperRegistry = mapperRegistry; this.em = em;
     }
 
 
@@ -50,6 +52,14 @@ public class CSVImporter {
             if (entity != null) {
                 mapper.save(entity);
             }
+
+            if(record.getRecordNumber() % DEFAULT_BATCH_SIZE == 100){
+                System.out.println("Batch deployed");
+                em.flush();
+                em.clear();
+            }
+
+
         }
     }
 
