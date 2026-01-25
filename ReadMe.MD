@@ -39,7 +39,7 @@ Action = Method for above handler, passing input record to it.
 
 ## CSV import
 Liknande CLI så är CSV indexerade fält av data,  Vi namnger dessa med en header och skickar dem vidare till en klass som implementerar CSVMapperInterface<T>
-Dessa klasser lagras i en Hashmap där typen de hanterar är nyckeln och i CSV så har vi kolumn namnged type. Så att varje rad anropar korrekt mapper.
+Dessa klasser lagras i en Hashmap där typen de hanterar är nyckeln och i CSV så har vi kolumn vid namn type. Så att varje rad anropar korrekt mapper.
 Att varje rad bara är en entitet är även ett val här, fält som delar samma namn mellan entititeter behöver inte samma type eller format. Samt så 
 blir de insatta i ordning som förhindrar KeyConstraintExpections i databasen.
 
