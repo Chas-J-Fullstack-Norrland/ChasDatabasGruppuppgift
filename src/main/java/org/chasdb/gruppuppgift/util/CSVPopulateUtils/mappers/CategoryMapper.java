@@ -1,5 +1,6 @@
 package org.chasdb.gruppuppgift.util.CSVPopulateUtils.mappers;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import org.apache.commons.csv.CSVRecord;
 import org.chasdb.gruppuppgift.models.Category;
@@ -18,9 +19,13 @@ public class CategoryMapper implements CsvEntityMapper<Category>{
 
     public CategoryMapper(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
-        this.categoryRepository.findAll().forEach(c -> cache.put(c.getName(), c));
+
     }
 
+
+    public void init(){
+        this.categoryRepository.findAll().forEach(c -> cache.put(c.getName(), c));
+    }
     @Override
     public Category map(CSVRecord record) {
         if(!record.isSet("name")){

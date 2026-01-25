@@ -3,6 +3,7 @@ package org.chasdb.gruppuppgift.services;
 import org.chasdb.gruppuppgift.models.Customer;
 import org.chasdb.gruppuppgift.models.Product;
 import org.chasdb.gruppuppgift.models.Reservation;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,11 +20,11 @@ public class CartServiceContract {
         this.reservationService = reservationService;
     }
 
+    @Transactional
     public Cart getCart(String customerEmail) {
         Customer customer = getCustomerOrThrow(customerEmail);
 
         List<Reservation> reservations = reservationService.getReservationsForCustomer(customerEmail);
-
         List<CartItem> items = reservations.stream()
                 .map(res -> new CartItem(
                         res.getInventory().getProduct(),

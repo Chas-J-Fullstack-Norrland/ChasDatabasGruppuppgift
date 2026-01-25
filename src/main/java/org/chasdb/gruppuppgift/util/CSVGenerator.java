@@ -6,6 +6,7 @@ import org.chasdb.gruppuppgift.models.Payment;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -93,6 +94,7 @@ public class CSVGenerator {
                 String sku = "SKU" + i;
                 String desc = "Description for " + name;
                 double price = 5 + (500 - 5) * random.nextDouble(); // price 5-500
+                String unitPrice = new BigDecimal(price).setScale(2, RoundingMode.FLOOR).stripTrailingZeros().toPlainString();
                 boolean active = random.nextBoolean();
                 int qty = 1 + random.nextInt(100);
                 // pick 1-3 random categories
@@ -104,8 +106,8 @@ public class CSVGenerator {
                 String catString = String.join("|", catList);
                 String createdAt = LocalDate.now().minusDays(random.nextInt(365)).format(DateTimeFormatter.ISO_LOCAL_DATE);
                 writer.write(String.format(
-                        "PRODUCT,%s,,%s,%s,%s,%f,%b,%d,%s,,,,,\n",
-                        name, createdAt, sku, desc, price, active, qty, catString));
+                        "PRODUCT,%s,,%s,%s,%s,%s,%b,%d,%s,,,,,\n",
+                        name, createdAt, sku, desc, unitPrice, active, qty, catString));
             }
 
             if(amountToGenerate.get("ORDERS")>0){
@@ -129,7 +131,8 @@ public class CSVGenerator {
                 String itemsStr = String.join("|", items);
                 String qtyStr = String.join("|", quantities);
 
-                double totalPrice = itemCount * (5 + (500 - 5) * random.nextDouble());
+                double randomPrice = itemCount * (5 + (500 - 5) * random.nextDouble());
+                String itemPrice = new BigDecimal(randomPrice).setScale(2, RoundingMode.FLOOR).stripTrailingZeros().toPlainString();
                 String createdAt = LocalDateTime.now()
                         .minusDays(random.nextInt(365))
                         .format(dtf);
@@ -138,10 +141,10 @@ public class CSVGenerator {
                 String status = statuses[random.nextInt(statuses.length)];
 
                 writer.write(String.format(
-                        "ORDER,,%s,%s,,,%f,,%s,,%s,%s,%s,,,\n",
+                        "ORDER,,%s,%s,,,%s,,%s,,%s,%s,%s,,,\n",
                         customerEmail,
                         createdAt,
-                        totalPrice,
+                        itemPrice,
                         qtyStr,
                         order,
                         itemsStr,

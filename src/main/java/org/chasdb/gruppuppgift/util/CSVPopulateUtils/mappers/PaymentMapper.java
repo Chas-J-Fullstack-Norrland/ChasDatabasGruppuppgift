@@ -1,5 +1,6 @@
 package org.chasdb.gruppuppgift.util.CSVPopulateUtils.mappers;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import org.apache.commons.csv.CSVRecord;
 import org.chasdb.gruppuppgift.models.Order;
@@ -29,6 +30,10 @@ public class PaymentMapper implements CsvEntityMapper<Payment> {
         this.paymentRepository = paymentRepository;
         this.orderRepository = orderRepository;
 
+    }
+
+
+    public void init(){
         this.paymentRepository.findAll().forEach(p -> cache.put(p.getReference(), p));
     }
 

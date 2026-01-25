@@ -1,5 +1,6 @@
 package org.chasdb.gruppuppgift.util.CSVPopulateUtils.mappers;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import org.apache.commons.csv.CSVRecord;
 import org.chasdb.gruppuppgift.models.Category;
@@ -34,9 +35,11 @@ public class ReservationMapper implements CsvEntityMapper<Reservation> {
         this.customerRepository = customerRepository;
         this.inventoryRepository = inventoryRepository;
 
+    }
+
+    public void init(){
         //caching all by customer.email and product.sku TODO! Refactor so all inventory handling goes through product instead.
         this.reservationRepository.findAll().forEach(r -> cache.put(new AbstractMap.SimpleEntry<>(r.getCustomer().getEmail(), r.getInventory().getProduct().getSku()), r));
-
 
     }
 

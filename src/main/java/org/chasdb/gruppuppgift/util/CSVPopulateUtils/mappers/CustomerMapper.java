@@ -1,6 +1,7 @@
 package org.chasdb.gruppuppgift.util.CSVPopulateUtils.mappers;
 
 
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import org.apache.commons.csv.CSVRecord;
 import org.chasdb.gruppuppgift.models.Category;
@@ -24,6 +25,11 @@ public class CustomerMapper implements CsvEntityMapper<Customer>{
 
     public CustomerMapper(CustomerRepository customerRepository) {
         this.customerRepository = customerRepository;
+
+    }
+
+
+    public void init(){
         this.customerRepository.findAll().forEach(c -> cache.put(c.getName(), c));
     }
 

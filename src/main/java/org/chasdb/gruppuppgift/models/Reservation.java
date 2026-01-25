@@ -17,7 +17,7 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "inventory_id", nullable = false)
     private Inventory inventory;
 

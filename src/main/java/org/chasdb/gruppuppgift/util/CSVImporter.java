@@ -41,6 +41,10 @@ public class CSVImporter {
                 .withFirstRecordAsHeader()
                 .parse(new InputStreamReader(inputStream));
 
+        //initialize cache of items to validate constraints
+        mapperRegistry.getMappers().forEach((k,v)->v.init());
+
+
         for (CSVRecord record : records) {
             String type = record.get("type");
             CsvEntityMapper<Object> mapper = mapperRegistry.getMapper(type);
@@ -53,14 +57,16 @@ public class CSVImporter {
                 mapper.save(entity);
             }
 
-            if(record.getRecordNumber() % DEFAULT_BATCH_SIZE == 100){
-                System.out.println("Batch deployed");
+            if(record.getRecordNumber() % DEFAULT_BATCH_SIZE == 0){
+                System.out.println("batched records up to " + record.getRecordNumber());
                 em.flush();
                 em.clear();
             }
 
 
         }
+
+        System.out.println("Import Done");
     }
 
     public record ImportResult(int successCount, int failureCount, List<String> errors) {

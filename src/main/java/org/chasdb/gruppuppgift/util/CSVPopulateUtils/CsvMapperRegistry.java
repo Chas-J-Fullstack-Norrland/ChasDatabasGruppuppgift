@@ -25,4 +25,8 @@ public class CsvMapperRegistry {
     public <T> CsvEntityMapper<T> getMapper(String type) {
         return (CsvEntityMapper<T>) mappers.get(type.toUpperCase());
     }
+
+    public Map<String, CsvEntityMapper<?>> getMappers() {
+        return mappers;
+    }
 }

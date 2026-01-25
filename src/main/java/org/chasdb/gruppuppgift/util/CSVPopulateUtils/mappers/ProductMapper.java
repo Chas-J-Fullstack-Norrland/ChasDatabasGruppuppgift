@@ -1,5 +1,6 @@
 package org.chasdb.gruppuppgift.util.CSVPopulateUtils.mappers;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import org.apache.commons.csv.CSVRecord;
 import org.chasdb.gruppuppgift.models.Category;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,10 +27,12 @@ public class ProductMapper implements CsvEntityMapper<Product>{
     public ProductMapper(ProductRepository productRepository,CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
         this.productRepository = productRepository;
-        this.productRepository.findAll().forEach(p -> cache.put(p.getName(), p)
-        );
+
     }
 
+    public void init(){
+       this.productRepository.findAll().forEach(p -> cache.put(p.getName(), p));
+    }
 
 
     @Override

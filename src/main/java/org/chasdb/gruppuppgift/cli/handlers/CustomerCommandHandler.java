@@ -46,7 +46,7 @@ public class CustomerCommandHandler implements CommandHandler {
     }
     private void list(){
         System.out.println("!Registered Customers!");
-        service.listCustomers().forEach(System.out::println);
+        service.listCustomers().forEach(c->System.out.println(c.printString()));
     }
     private void find(CommandInput input){
         if(!input.flags().containsKey("email")){

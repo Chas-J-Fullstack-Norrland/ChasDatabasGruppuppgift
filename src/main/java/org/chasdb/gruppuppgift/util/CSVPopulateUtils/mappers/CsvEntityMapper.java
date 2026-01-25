@@ -6,5 +6,6 @@ public interface CsvEntityMapper<T> {
     T map(CSVRecord record);
     void save(T entity);
 
+    void init();
     String supportsType();
 }
