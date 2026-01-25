@@ -5,6 +5,10 @@ Och visa att man kan hantera större datamängder.
 
 Bevis på fungerande backend finns i test som körs via tester emot lokal databas.
 
+## Instructioner
+Klona repot, 
+Skapa en postgress databas och fyll i informationen i application.yaml. (tänk på att sätta validate till create första körningen),
+När programmet sedan körs så skriv "System help" för listan av kommandon
 
 
 ## Relationer
@@ -25,3 +29,18 @@ I praktik så skulle reservationer släppas utav en schemalagd databas task som 
 ## Paginering och rapporter
 Vi implementerade paginering endast till rapporter.   Detta gör vi genom ett record object som vi mappar värden ifrån en Query,  Specifikt då ifrån OrderItemRepository då denna är perfekt för att hitta vilken produkt som det säljs mest utav. Vi ser även här att vi vill använda relationen för att lättare associera mer en ett ID till denna relation för att då hämnta ut information av produkten och hur många gånger den sålts.
 Resterande rapporter hittas I RapportService och kallar på relevant repository och metod för att samla informationen.
+
+## CLI
+Enkel tokenizering utav inputstream för att få Domain,Actions,Args,Flags i ett input record
+Args = Indexed argumnets
+Flags = named variables
+Domain = Type of handler we are calling.
+Action = Method for above handler, passing input record to it.
+
+## CSV import
+Liknande CLI så är CSV indexerade fält av data,  Vi namnger dessa med en header och skickar dem vidare till en klass som implementerar CSVMapperInterface<T>
+Dessa klasser lagras i en Hashmap där typen de hanterar är nyckeln och i CSV så har vi kolumn namnged type. Så att varje rad anropar korrekt mapper.
+Att varje rad bara är en entitet är även ett val här, fält som delar samma namn mellan entititeter behöver inte samma type eller format. Samt så 
+blir de insatta i ordning som förhindrar KeyConstraintExpections i databasen.
+
+Vi batchar dessa rader i grupper på 1000 då Hibernate är väldigt långsam på att sätta in entititer en för en.
